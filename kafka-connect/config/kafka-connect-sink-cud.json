@@ -1,0 +1,16 @@
+{
+  "name": "Neo4jSinkConnectorCud",
+  "config": {
+    "topics": "cudPersonNode,cudActedInRel",
+    "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": false,
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": false,
+    "neo4j.server.uri": "bolt://neo4j:7687",
+    "neo4j.authentication.basic.username": "neo4j",
+    "neo4j.authentication.basic.password": "password",
+    "neo4j.encryption.enabled": false,
+    "neo4j.topic.cud": "cudPersonNode;cudActedInRel"
+  }
+}
