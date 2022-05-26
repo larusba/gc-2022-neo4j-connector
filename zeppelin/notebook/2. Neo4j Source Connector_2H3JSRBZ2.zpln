@@ -1,0 +1,483 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n\n## Create the Source instance\n\nHere is a piece of JSON configuration we\u0027re going to use to create our Neo4j Source connector.\nWe\u0027re going to extract all the `Person` nodes.\n\n```\n{\n  \"name\": \"Neo4jSourceConnector\",\n  \"config\": {\n    \"topic\": \"person\",\n    \"connector.class\": \"streams.kafka.connect.source.Neo4jSourceConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.streaming.poll.interval.msecs\": 5000,\n    \"neo4j.streaming.property\": \"timestamp\",\n    \"neo4j.streaming.from\": \"LAST_COMMITTED\",\n    \"neo4j.enforce.schema\": false,\n    \"neo4j.source.query\": \"MATCH (p:Person) WHERE p.timestamp \u003e $lastCheck RETURN p.name AS name, p.born AS born, p.timestamp AS timestamp\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint (be sure to run the command from the `kafka-connect/config` folder), as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-neo4j-source.json\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 15:32:01.679",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eCreate the Source instance\u003c/h2\u003e\n\u003cp\u003eHere is a piece of JSON configuration we\u0026rsquo;re going to use to create our Neo4j Source connector.\u003cbr /\u003e\nWe\u0026rsquo;re going to extract all the \u003ccode\u003ePerson\u003c/code\u003e nodes.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;name\u0026quot;: \u0026quot;Neo4jSourceConnector\u0026quot;,\n  \u0026quot;config\u0026quot;: {\n    \u0026quot;topic\u0026quot;: \u0026quot;person\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.source.Neo4jSourceConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.streaming.poll.interval.msecs\u0026quot;: 5000,\n    \u0026quot;neo4j.streaming.property\u0026quot;: \u0026quot;timestamp\u0026quot;,\n    \u0026quot;neo4j.streaming.from\u0026quot;: \u0026quot;LAST_COMMITTED\u0026quot;,\n    \u0026quot;neo4j.enforce.schema\u0026quot;: false,\n    \u0026quot;neo4j.source.query\u0026quot;: \u0026quot;MATCH (p:Person) WHERE p.timestamp \u0026gt; $lastCheck RETURN p.name AS name, p.born AS born, p.timestamp AS timestamp\u0026quot;\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint (be sure to run the command from the \u003ccode\u003ekafka-connect/config\u003c/code\u003e folder), as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-neo4j-source.json\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471421569_1506660278",
+      "id": "paragraph_1653471421569_1506660278",
+      "dateCreated": "2022-05-25 09:37:01.569",
+      "dateStarted": "2022-05-25 15:32:01.679",
+      "dateFinished": "2022-05-25 15:32:01.693",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\n\nChecking the topics list you will not find the new topic `person` because data does not satisfy our `neo4j.source.query`.\nThe reason is that our nodes don\u0027t have the `timestamp` property.\nSo, let\u0027s add it!",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:39:47.621",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eChecking the topics list you will not find the new topic \u003ccode\u003eperson\u003c/code\u003e because data does not satisfy our \u003ccode\u003eneo4j.source.query\u003c/code\u003e.\u003cbr /\u003e\nThe reason is that our nodes don\u0026rsquo;t have the \u003ccode\u003etimestamp\u003c/code\u003e property.\u003cbr /\u003e\nSo, let\u0026rsquo;s add it!\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471565849_64615090",
+      "id": "paragraph_1653471565849_64615090",
+      "dateCreated": "2022-05-25 09:39:25.849",
+      "dateStarted": "2022-05-25 09:39:47.620",
+      "dateFinished": "2022-05-25 09:39:47.643",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nMATCH (n) SET n.timestamp \u003d timestamp()",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:40:01.874",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471587619_296791203",
+      "id": "paragraph_1653471587619_296791203",
+      "dateCreated": "2022-05-25 09:39:47.619",
+      "status": "READY"
+    },
+    {
+      "text": "%md\nNow you will find the topic!!\n\n\nCheck if the new topic has been created:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```\n\nCheck events into `person` topic:\n\n```\nkcat -C -b localhost:9092 -t person\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:40:15.906",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eNow you will find the topic!!\u003c/p\u003e\n\u003cp\u003eCheck if the new topic has been created:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eCheck events into \u003ccode\u003eperson\u003c/code\u003e topic:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -C -b localhost:9092 -t person\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471612262_665283400",
+      "id": "paragraph_1653471612262_665283400",
+      "dateCreated": "2022-05-25 09:40:12.262",
+      "dateStarted": "2022-05-25 09:40:15.901",
+      "dateFinished": "2022-05-25 09:40:15.915",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nWe should find all the `Person` nodes transformed into events like the following:\n\n```\n...\n\"{\\\"name\\\":\\\"Penny Marshall\\\",\\\"born\\\":1943,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"Paul Blythe\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"Angela Scope\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"Jessica Thompson\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"James Thompson\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:40:30.546",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eWe should find all the \u003ccode\u003ePerson\u003c/code\u003e nodes transformed into events like the following:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e...\n\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;Penny Marshall\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:1943,\\\u0026quot;timestamp\\\u0026quot;:1652883491606}\u0026quot;\n\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;Paul Blythe\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:null,\\\u0026quot;timestamp\\\u0026quot;:1652883491606}\u0026quot;\n\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;Angela Scope\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:null,\\\u0026quot;timestamp\\\u0026quot;:1652883491606}\u0026quot;\n\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;Jessica Thompson\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:null,\\\u0026quot;timestamp\\\u0026quot;:1652883491606}\u0026quot;\n\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;James Thompson\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:null,\\\u0026quot;timestamp\\\u0026quot;:1652883491606}\u0026quot;\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471615899_2096871083",
+      "id": "paragraph_1653471615899_2096871083",
+      "dateCreated": "2022-05-25 09:40:15.899",
+      "dateStarted": "2022-05-25 09:40:30.546",
+      "dateFinished": "2022-05-25 09:40:30.562",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nImagine for example a situation where your Neo4j Source Connector stop working for some reason, and you need to restart it manually.\nNodes and relationship which has been created or updated during this down time are not lost. When you restart the connector it resumes working from the last known offsets!!\n\nLet\u0027s simulate this situation by removing the connector:\n\n```\ncurl -X DELETE http://localhost:8083/connectors/Neo4jSourceConnector\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 15:25:10.764",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eImagine for example a situation where your Neo4j Source Connector stop working for some reason, and you need to restart it manually.\u003cbr /\u003e\nNodes and relationship which has been created or updated during this down time are not lost. When you restart the connector it resumes working from the last known offsets!!\u003c/p\u003e\n\u003cp\u003eLet\u0026rsquo;s simulate this situation by removing the connector:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X DELETE http://localhost:8083/connectors/Neo4jSourceConnector\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653492128917_336250619",
+      "id": "paragraph_1653492128917_336250619",
+      "dateCreated": "2022-05-25 15:22:08.917",
+      "dateStarted": "2022-05-25 15:25:10.762",
+      "dateFinished": "2022-05-25 15:25:10.775",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nNow create some other `Person` nodes, for example:",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 15:30:18.182",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eNow create some other \u003ccode\u003ePerson\u003c/code\u003e nodes, for example:\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653492310761_1853887876",
+      "id": "paragraph_1653492310761_1853887876",
+      "dateCreated": "2022-05-25 15:25:10.762",
+      "dateStarted": "2022-05-25 15:30:18.183",
+      "dateFinished": "2022-05-25 15:30:18.195",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nMERGE (p:Person {name: \"Orlando Bloom\"}) SET p.born\u003d1977, p.timestamp\u003dtimestamp() RETURN p",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 15:30:20.257",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "name": "string",
+                      "born": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":218,\"data\":{\"name\":\"Orlando Bloom\",\"born\":1977,\"timestamp\":1653492620303},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\",\"SourceEvent\":\"#E11567\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653492369404_1908467127",
+      "id": "paragraph_1653492369404_1908467127",
+      "dateCreated": "2022-05-25 15:26:09.404",
+      "dateStarted": "2022-05-25 15:30:20.277",
+      "dateFinished": "2022-05-25 15:30:20.371",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nMERGE (p:Person {name: \"Ian Holm\"}) SET p.born\u003d1931, p.timestamp\u003dtimestamp() RETURN p",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 15:30:24.539",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "name": "string",
+                      "born": "string",
+                      "timestamp": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":219,\"data\":{\"name\":\"Ian Holm\",\"born\":1931,\"timestamp\":1653492622299},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\",\"SourceEvent\":\"#E11567\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653492507512_516744253",
+      "id": "paragraph_1653492507512_516744253",
+      "dateCreated": "2022-05-25 15:28:27.512",
+      "dateStarted": "2022-05-25 15:30:22.270",
+      "dateFinished": "2022-05-25 15:30:22.330",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nIf you check the content of `person` topic via `kcat` consumer you will discover that these 2 nodes has not been reflected:\n\n```\nkcat -C -b localhost:9092 -t person\n```\n\nNow, restarting the Neo4j Source connector:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-neo4j-source.json\n```\n\nyou will find the expected events:\n\n```\n\"{\\\"name\\\":\\\"Orlando Bloom\\\",\\\"born\\\":1977,\\\"timestamp\\\":1653492620303}\"\n\"{\\\"name\\\":\\\"Ian Holm\\\",\\\"born\\\":1931,\\\"timestamp\\\":1653492622299}\"\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 15:33:03.862",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eIf you check the content of \u003ccode\u003eperson\u003c/code\u003e topic via \u003ccode\u003ekcat\u003c/code\u003e consumer you will discover that these 2 nodes has not been reflected:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -C -b localhost:9092 -t person\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow, restarting the Neo4j Source connector:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-neo4j-source.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eyou will find the expected events:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;Orlando Bloom\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:1977,\\\u0026quot;timestamp\\\u0026quot;:1653492620303}\u0026quot;\n\u0026quot;{\\\u0026quot;name\\\u0026quot;:\\\u0026quot;Ian Holm\\\u0026quot;,\\\u0026quot;born\\\u0026quot;:1931,\\\u0026quot;timestamp\\\u0026quot;:1653492622299}\u0026quot;\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653492546587_1981270462",
+      "id": "paragraph_1653492546587_1981270462",
+      "dateCreated": "2022-05-25 15:29:06.587",
+      "dateStarted": "2022-05-25 15:33:03.855",
+      "dateFinished": "2022-05-25 15:33:03.866",
+      "status": "FINISHED"
+    }
+  ],
+  "name": "2. Neo4j Source Connector",
+  "id": "2H3JSRBZ2",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview2",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

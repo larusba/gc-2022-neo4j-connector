@@ -1,5 +1,5 @@
 {
-  "name": "Neo4jSinkConnectorCypher",
+  "name": "Neo4jSinkConnector",
   "config": {
     "topics": "movie",
     "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
@@ -12,6 +12,6 @@
     "neo4j.authentication.basic.username": "neo4j",
     "neo4j.authentication.basic.password": "password",
     "neo4j.encryption.enabled": false,
-    "neo4j.topic.cypher.movie": "MERGE (m:Movie {title: event.title, released: event.released, tagline: event.tagline, timestamp: timestamp()}) RETURN m"
+    "neo4j.topic.cypher.movie": "MERGE (m:Movie {title: event.title}) SET m.released=event.released, m.tagline=event.tagline, m.timestamp=timestamp() RETURN m"
   }
 }

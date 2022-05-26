@@ -1392,6 +1392,71 @@
         "isUserImpersonate": false
       }
     },
+    "neo4jSourceDb": {
+      "id": "neo4jSourceDb",
+      "name": "neo4jSourceDb",
+      "group": "neo4j",
+      "properties": {
+        "neo4j.url": {
+          "name": "neo4j.url",
+          "value": "bolt://neo4j:7687",
+          "type": "textarea",
+          "description": "The Neo4j\u0027s BOLT url."
+        },
+        "neo4j.database": {
+          "name": "neo4j.database",
+          "value": "sourcedb",
+          "type": "textarea",
+          "description": "The neo4j target database, if empty use the dafault db."
+        },
+        "neo4j.auth.type": {
+          "name": "neo4j.auth.type",
+          "value": "BASIC",
+          "type": "textarea",
+          "description": "The Neo4j\u0027s authentication type (NONE, BASIC)."
+        },
+        "neo4j.auth.user": {
+          "name": "neo4j.auth.user",
+          "value": "neo4j",
+          "type": "textarea",
+          "description": "The Neo4j user name."
+        },
+        "neo4j.auth.password": {
+          "name": "neo4j.auth.password",
+          "value": "password",
+          "type": "textarea",
+          "description": "The Neo4j user password."
+        },
+        "neo4j.max.concurrency": {
+          "name": "neo4j.max.concurrency",
+          "value": "50",
+          "type": "textarea",
+          "description": "Max concurrency call from Zeppelin to Neo4j server."
+        }
+      },
+      "status": "READY",
+      "interpreterGroup": [
+        {
+          "name": "neo4j",
+          "class": "org.apache.zeppelin.graph.neo4j.Neo4jCypherInterpreter",
+          "defaultInterpreter": false,
+          "editor": {
+            "editOnDblClick": false
+          }
+        }
+      ],
+      "dependencies": [],
+      "option": {
+        "remote": true,
+        "port": -1,
+        "perNote": "shared",
+        "perUser": "shared",
+        "isExistingProcess": false,
+        "setPermission": false,
+        "owners": [],
+        "isUserImpersonate": false
+      }
+    },
     "alluxio": {
       "id": "alluxio",
       "name": "alluxio",

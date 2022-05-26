@@ -1,7 +1,7 @@
 {
   "name": "Neo4jSinkConnectorSchema",
   "config": {
-    "topics": "schemaPerson,schemaActedIn",
+    "topics": "sourcedb",
     "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "key.converter.schemas.enable": false,
@@ -12,6 +12,6 @@
     "neo4j.authentication.basic.username": "neo4j",
     "neo4j.authentication.basic.password": "password",
     "neo4j.encryption.enabled": false,
-    "neo4j.topic.cdc.schema": "schemaPerson;schemaActedIn"
+    "neo4j.topic.cdc.schema": "sourcedb"
   }
 }

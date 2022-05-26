@@ -1,0 +1,289 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the CUD File Format strategy.\n\n```\n{\n  \"name\": \"Neo4jSinkConnectorCud\",\n  \"config\": {\n    \"topics\": \"cudPersonNode,cudActedInRel\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cud\": \"cudPersonNode;cudActedInRel\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cud.json\n```\n\nNow our topics list should include also our new `cudPersonNode` and `cudActedInRel` topics. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 10:21:45.586",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the CUD File Format strategy.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;name\u0026quot;: \u0026quot;Neo4jSinkConnectorCud\u0026quot;,\n  \u0026quot;config\u0026quot;: {\n    \u0026quot;topics\u0026quot;: \u0026quot;cudPersonNode,cudActedInRel\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.sink.Neo4jSinkConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.topic.cud\u0026quot;: \u0026quot;cudPersonNode;cudActedInRel\u0026quot;\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cud.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow our topics list should include also our new \u003ccode\u003ecudPersonNode\u003c/code\u003e and \u003ccode\u003ecudActedInRel\u003c/code\u003e topics. We can verify it by running:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653474079504_1335427108",
+      "id": "paragraph_1653474079504_1335427108",
+      "dateCreated": "2022-05-25 10:21:19.504",
+      "dateStarted": "2022-05-25 10:21:45.581",
+      "dateFinished": "2022-05-25 10:21:45.597",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nLet\u0027s send the following event \n\n```\n{ \"op\": \"merge\", \"properties\": { \"born\": 1959 }, \"ids\": {\"name\": \"Sean Bean\"}, \"labels\": [\"Person\"], \"type\": \"node\" }\n```\n\ninto the `cudPersonNode` topic via `kcat` producer:\n\n```\nkcat -P -b localhost:9092 -t cudPersonNode\n```\n\nWith the provided CUD format, the node that is going to be created will be a `Person` node with `name` as key and `born` as property.\n\nLet\u0027s check it out by running the query in the next paragraph",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 10:23:06.825",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLet\u0026rsquo;s send the following event\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{ \u0026quot;op\u0026quot;: \u0026quot;merge\u0026quot;, \u0026quot;properties\u0026quot;: { \u0026quot;born\u0026quot;: 1959 }, \u0026quot;ids\u0026quot;: {\u0026quot;name\u0026quot;: \u0026quot;Sean Bean\u0026quot;}, \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;], \u0026quot;type\u0026quot;: \u0026quot;node\u0026quot; }\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003einto the \u003ccode\u003ecudPersonNode\u003c/code\u003e topic via \u003ccode\u003ekcat\u003c/code\u003e producer:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -P -b localhost:9092 -t cudPersonNode\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eWith the provided CUD format, the node that is going to be created will be a \u003ccode\u003ePerson\u003c/code\u003e node with \u003ccode\u003ename\u003c/code\u003e as key and \u003ccode\u003eborn\u003c/code\u003e as property.\u003c/p\u003e\n\u003cp\u003eLet\u0026rsquo;s check it out by running the query in the next paragraph\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653474105580_832314901",
+      "id": "paragraph_1653474105580_832314901",
+      "dateCreated": "2022-05-25 10:21:45.580",
+      "dateStarted": "2022-05-25 10:23:06.820",
+      "dateFinished": "2022-05-25 10:23:06.836",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nMATCH (p:Person {name: \"Sean Bean\"}) RETURN p",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 11:03:30.735",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "name": "string",
+                      "born": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":180,\"data\":{\"name\":\"Sean Bean\",\"born\":1959},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653474186820_635166199",
+      "id": "paragraph_1653474186820_635166199",
+      "dateCreated": "2022-05-25 10:23:06.820",
+      "dateStarted": "2022-05-25 11:03:30.753",
+      "dateFinished": "2022-05-25 11:03:30.797",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nLet\u0027s send the following event \n\n```\n{ \"op\": \"create\", \"properties\": { \"roles\": \"Boromir\" }, \"rel_type\": \"ACTED_IN\", \"from\": { \"ids\": {\"name\": \"Sean Bean\"}, \"labels\": [\"Person\"] }, \"to\": { \"ids\": {\"title\": \"The Lord of the Rings - The Fellowship of the Ring\"}, \"labels\": [\"Movie\"] }, \"type\":\"relationship\" }\n```\n\ninto the `cudActedInRel` topic via `kcat` producer:\n\n```\nkcat -P -b localhost:9092 -t cudActedInRel\n```\n\nWith the provided CUD format, the relationship that is going to be created will be a `ACTED_IN` relationship, with `roles` as property, between a `Person` node and a `Movie` node.\n\nLet\u0027s check it out by running the query in the next paragraph",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 11:04:25.504",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLet\u0026rsquo;s send the following event\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{ \u0026quot;op\u0026quot;: \u0026quot;create\u0026quot;, \u0026quot;properties\u0026quot;: { \u0026quot;roles\u0026quot;: \u0026quot;Boromir\u0026quot; }, \u0026quot;rel_type\u0026quot;: \u0026quot;ACTED_IN\u0026quot;, \u0026quot;from\u0026quot;: { \u0026quot;ids\u0026quot;: {\u0026quot;name\u0026quot;: \u0026quot;Sean Bean\u0026quot;}, \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;] }, \u0026quot;to\u0026quot;: { \u0026quot;ids\u0026quot;: {\u0026quot;title\u0026quot;: \u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;}, \u0026quot;labels\u0026quot;: [\u0026quot;Movie\u0026quot;] }, \u0026quot;type\u0026quot;:\u0026quot;relationship\u0026quot; }\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003einto the \u003ccode\u003ecudActedInRel\u003c/code\u003e topic via \u003ccode\u003ekcat\u003c/code\u003e producer:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -P -b localhost:9092 -t cudActedInRel\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eWith the provided CUD format, the relationship that is going to be created will be a \u003ccode\u003eACTED_IN\u003c/code\u003e relationship, with \u003ccode\u003eroles\u003c/code\u003e as property, between a \u003ccode\u003ePerson\u003c/code\u003e node and a \u003ccode\u003eMovie\u003c/code\u003e node.\u003c/p\u003e\n\u003cp\u003eLet\u0026rsquo;s check it out by running the query in the next paragraph\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653475906914_93029632",
+      "id": "paragraph_1653475906914_93029632",
+      "dateCreated": "2022-05-25 10:51:46.914",
+      "dateStarted": "2022-05-25 11:04:25.503",
+      "dateFinished": "2022-05-25 11:04:25.516",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nMATCH (p:Person {name:\"Sean Bean\"}) MATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"}) MATCH (p)-[r:ACTED_IN]-\u003e(m) RETURN p,r,m",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 11:04:31.582",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "name": "string",
+                      "born": "string",
+                      "tagline": "string",
+                      "title": "string",
+                      "released": "string",
+                      "roles": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":180,\"data\":{\"name\":\"Sean Bean\",\"born\":1959},\"label\":\"Person\"},{\"id\":171,\"data\":{\"tagline\":\"\",\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":2001},\"label\":\"Movie\"}],\"edges\":[{\"source\":180,\"target\":171,\"id\":255,\"data\":{\"roles\":\"Boromir\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653475917124_961319735",
+      "id": "paragraph_1653475917124_961319735",
+      "dateCreated": "2022-05-25 10:51:57.125",
+      "dateStarted": "2022-05-25 11:04:29.234",
+      "dateFinished": "2022-05-25 11:04:29.284",
+      "status": "FINISHED"
+    }
+  ],
+  "name": "Neo4j Sink Connector - CUD File Format",
+  "id": "2H4GUNJ5R",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview2",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

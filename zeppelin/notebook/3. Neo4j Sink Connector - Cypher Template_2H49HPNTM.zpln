@@ -1,0 +1,170 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Cypher template strategy.\nWe’re going to create `Movie` nodes based on the events we\u0027ll send into the related topic: \n\n## Create the Sink instance\n\n```\n{\n  \"name\": \"Neo4jSinkConnector\",\n  \"config\": {\n    \"topics\": \"movie\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"kafka.bootstrap.servers\": \"broker:9093\",\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cypher.movie\": \"MERGE (m:Movie {title: event.title}) SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp() RETURN m\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cypher.json\n```\n\nIf you want to verify the active connectors just run:\n\n```\ncurl -X GET http://localhost:8083/connectors\n```\n\nNow our topics list should include also our new `movie` topic. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:41:58.374",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Cypher template strategy.\u003cbr /\u003e\nWe’re going to create \u003ccode\u003eMovie\u003c/code\u003e nodes based on the events we\u0026rsquo;ll send into the related topic:\u003c/p\u003e\n\u003ch2\u003eCreate the Sink instance\u003c/h2\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;name\u0026quot;: \u0026quot;Neo4jSinkConnector\u0026quot;,\n  \u0026quot;config\u0026quot;: {\n    \u0026quot;topics\u0026quot;: \u0026quot;movie\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.sink.Neo4jSinkConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;kafka.bootstrap.servers\u0026quot;: \u0026quot;broker:9093\u0026quot;,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.topic.cypher.movie\u0026quot;: \u0026quot;MERGE (m:Movie {title: event.title}) SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp() RETURN m\u0026quot;\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cypher.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eIf you want to verify the active connectors just run:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X GET http://localhost:8083/connectors\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow our topics list should include also our new \u003ccode\u003emovie\u003c/code\u003e topic. We can verify it by running:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471694190_215384766",
+      "id": "paragraph_1653471694190_215384766",
+      "dateCreated": "2022-05-25 09:41:34.190",
+      "dateStarted": "2022-05-25 09:41:58.374",
+      "dateFinished": "2022-05-25 09:41:58.401",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nby creating a Kafkacat produer:\n\n```\nkcat -b localhost:9092 -t movie -P -D\\n\n```\n\nLet\u0027s send the following event into the `movie` topic:\n\n```\n{\"title\": \"The Lord of the Rings - The Fellowship of the Ring\", \"released\": \"2001\", \"tagline\": \"\"}\n```\n\nType `ctrl+D` to close the `kcat` producer.",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:42:17.165",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eby creating a Kafkacat produer:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -b localhost:9092 -t movie -P -D\\n\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eLet\u0026rsquo;s send the following event into the \u003ccode\u003emovie\u003c/code\u003e topic:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\u0026quot;title\u0026quot;: \u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;, \u0026quot;released\u0026quot;: \u0026quot;2001\u0026quot;, \u0026quot;tagline\u0026quot;: \u0026quot;\u0026quot;}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eType \u003ccode\u003ectrl+D\u003c/code\u003e to close the \u003ccode\u003ekcat\u003c/code\u003e producer.\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471718372_767623947",
+      "id": "paragraph_1653471718372_767623947",
+      "dateCreated": "2022-05-25 09:41:58.372",
+      "dateStarted": "2022-05-25 09:42:17.162",
+      "dateFinished": "2022-05-25 09:42:17.173",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nNow we should find our new `Movie` node into the graph",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:42:30.143",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eNow we should find our new \u003ccode\u003eMovie\u003c/code\u003e node into the graph\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471737161_132654258",
+      "id": "paragraph_1653471737161_132654258",
+      "dateCreated": "2022-05-25 09:42:17.161",
+      "dateStarted": "2022-05-25 09:42:30.143",
+      "dateFinished": "2022-05-25 09:42:30.156",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nmatch (m:Movie {title:\"The Lord of the Rings - The Fellowship of the Ring\"}) return m",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 09:42:40.716",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653471750141_1136779395",
+      "id": "paragraph_1653471750141_1136779395",
+      "dateCreated": "2022-05-25 09:42:30.141",
+      "status": "READY"
+    }
+  ],
+  "name": "Kafka Connect Sink Connector - Cypher Template",
+  "id": "2H49HPNTM",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview2",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

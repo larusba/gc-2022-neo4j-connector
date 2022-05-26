@@ -1,0 +1,99 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\nHere is a piece of JSON configuration we’re going to use to update an already existent connector, the one we had configured with the Cypher template strategy on the `movie` topic, and configuring also a DLQ topic.\n\n```\n{\n    \"topics\": \"movie\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"kafka.bootstrap.servers\": \"broker:9093\",\n    \"errors.tolerance\": \"all\",\n    \"errors.log.enable\": true,\n    \"errors.deadletterqueue.topic.name\": \"dlq-movie\",\n    \"errors.log.include.messages\": true,\n    \"errors.deadletterqueue.topic.replication.factor\": 1,\n    \"errors.deadletterqueue.context.headers.enable\": true,\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cypher.movie\": \"MERGE (m:Movie {title: event.title}) SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp() RETURN m\"\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X PUT http://localhost:8083/connectors/Neo4jSinkConnectorCypher/config -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cypher-dlq.json\n```\n\nPlease note that we\u0027ve updated an already existing connector (in particular, the one we\u0027ve created for the cypher template strategy).\n\nNow our topics list should include also our new `dlq-movie` topic. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 11:26:27.998",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eHere is a piece of JSON configuration we’re going to use to update an already existent connector, the one we had configured with the Cypher template strategy on the \u003ccode\u003emovie\u003c/code\u003e topic, and configuring also a DLQ topic.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n    \u0026quot;topics\u0026quot;: \u0026quot;movie\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.sink.Neo4jSinkConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;kafka.bootstrap.servers\u0026quot;: \u0026quot;broker:9093\u0026quot;,\n    \u0026quot;errors.tolerance\u0026quot;: \u0026quot;all\u0026quot;,\n    \u0026quot;errors.log.enable\u0026quot;: true,\n    \u0026quot;errors.deadletterqueue.topic.name\u0026quot;: \u0026quot;dlq-movie\u0026quot;,\n    \u0026quot;errors.log.include.messages\u0026quot;: true,\n    \u0026quot;errors.deadletterqueue.topic.replication.factor\u0026quot;: 1,\n    \u0026quot;errors.deadletterqueue.context.headers.enable\u0026quot;: true,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.topic.cypher.movie\u0026quot;: \u0026quot;MERGE (m:Movie {title: event.title}) SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp() RETURN m\u0026quot;\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X PUT http://localhost:8083/connectors/Neo4jSinkConnectorCypher/config -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cypher-dlq.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003ePlease note that we\u0026rsquo;ve updated an already existing connector (in particular, the one we\u0026rsquo;ve created for the cypher template strategy).\u003c/p\u003e\n\u003cp\u003eNow our topics list should include also our new \u003ccode\u003edlq-movie\u003c/code\u003e topic. We can verify it by running:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653476715546_1690879644",
+      "id": "paragraph_1653476715546_1690879644",
+      "dateCreated": "2022-05-25 11:05:15.546",
+      "dateStarted": "2022-05-25 11:26:27.998",
+      "dateFinished": "2022-05-25 11:26:28.010",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\n\n### Send bad data\n\nAt this point, if we send some bad event such as:\n\n```\n{name: \"Ian McKellen\" born: 1939}\n```\n\nusing a `kcat` producer as follow:\n\n```\nkcat -P -b localhost:9092 -t movie\n```\n\nWe should get a `DataException` and you can verify it by checking Kafka Connect logs with the following:\n\n```\ndocker-compose logs -f connect\n```\n\nFurthermore, checking the content of the `dlq-movie` topic:\n\n```\nkcat -C -b localhost:9092 -t dlq-movie\n```\n\nwe\u0027ll exactly find the event we have sent!\n\nWith the Kafkacat tool we can do more! We can see also event\u0027s metadata and in particular the headers:\n\n```\nkcat -b localhost:9092 -t dlq-movie -C -o-0 -f \u0027\\nKey (%K bytes): %k  \nValue (%S bytes): %s  \nTimestamp: %T  \nPartition: %p  \nOffset: %o  \nHeaders: %h\\n\u0027\n```\n",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 11:26:14.161",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eSend bad data\u003c/h3\u003e\n\u003cp\u003eAt this point, if we send some bad event such as:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{name: \u0026quot;Ian McKellen\u0026quot; born: 1939}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eusing a \u003ccode\u003ekcat\u003c/code\u003e producer as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -P -b localhost:9092 -t movie\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eWe should get a \u003ccode\u003eDataException\u003c/code\u003e and you can verify it by checking Kafka Connect logs with the following:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker-compose logs -f connect\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eFurthermore, checking the content of the \u003ccode\u003edlq-movie\u003c/code\u003e topic:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -C -b localhost:9092 -t dlq-movie\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003ewe\u0026rsquo;ll exactly find the event we have sent!\u003c/p\u003e\n\u003cp\u003eWith the Kafkacat tool we can do more! We can see also event\u0026rsquo;s metadata and in particular the headers:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -b localhost:9092 -t dlq-movie -C -o-0 -f \u0027\\nKey (%K bytes): %k  \nValue (%S bytes): %s  \nTimestamp: %T  \nPartition: %p  \nOffset: %o  \nHeaders: %h\\n\u0027\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653476874553_1221846322",
+      "id": "paragraph_1653476874553_1221846322",
+      "dateCreated": "2022-05-25 11:07:54.553",
+      "dateStarted": "2022-05-25 11:26:14.161",
+      "dateFinished": "2022-05-25 11:26:14.174",
+      "status": "FINISHED"
+    }
+  ],
+  "name": "8. Neo4j Sink Connector - DLQ",
+  "id": "2H3BCUTWM",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview2",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

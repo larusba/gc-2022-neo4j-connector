@@ -12,6 +12,6 @@
     "neo4j.authentication.basic.username": "neo4j",
     "neo4j.authentication.basic.password": "password",
     "neo4j.encryption.enabled": false,
-    "neo4j.topic.pattern.relationship.actedInRelPattern": "(:Person{!name,born})-[:ACTED_IN{roles}]->(:Movie{!title,!released,tagline})"
+    "neo4j.topic.pattern.relationship.actedInRelPattern": "(:Person{!name,born})-[:ACTED_IN{roles}]->(:Movie{!title,released,tagline})"
   }
 }

@@ -1,0 +1,173 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\nSince this strategy is based on CDC events, as per the Schema strategy, it is generally used to keep two Neo4j instances in-sync or, as we said before, to migrate from a Neo4j on-premise instance to a Neo4j Aura instance. \n\n\n## Create the Sink instance\n\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the SourceId strategy.\n\n```\n{\n  \"name\": \"Neo4jSinkConnectorSourceId\",\n  \"config\": {\n    \"topics\": \"sourceIdMovie\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"kafka.bootstrap.servers\": \"broker:9093\",\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cdc.sourceId\": \"sourceIdMovie\",\n    \"neo4j.topic.cdc.sourceId.labelName\": \"SourceEvent\",\n    \"neo4j.topic.cdc.sourceId.idName\": \"sourceId\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cdc-sourceId.json\n```\n\nNow our topics list should include also our new `sourceIdMovie` topic. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 14:19:12.772",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eSince this strategy is based on CDC events, as per the Schema strategy, it is generally used to keep two Neo4j instances in-sync or, as we said before, to migrate from a Neo4j on-premise instance to a Neo4j Aura instance.\u003c/p\u003e\n\u003ch2\u003eCreate the Sink instance\u003c/h2\u003e\n\u003cp\u003eHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the SourceId strategy.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;name\u0026quot;: \u0026quot;Neo4jSinkConnectorSourceId\u0026quot;,\n  \u0026quot;config\u0026quot;: {\n    \u0026quot;topics\u0026quot;: \u0026quot;sourceIdMovie\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.sink.Neo4jSinkConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;kafka.bootstrap.servers\u0026quot;: \u0026quot;broker:9093\u0026quot;,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.topic.cdc.sourceId\u0026quot;: \u0026quot;sourceIdMovie\u0026quot;,\n    \u0026quot;neo4j.topic.cdc.sourceId.labelName\u0026quot;: \u0026quot;SourceEvent\u0026quot;,\n    \u0026quot;neo4j.topic.cdc.sourceId.idName\u0026quot;: \u0026quot;sourceId\u0026quot;\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cdc-sourceId.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow our topics list should include also our new \u003ccode\u003esourceIdMovie\u003c/code\u003e topic. We can verify it by running:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653485688444_2005120958",
+      "id": "paragraph_1653485688444_2005120958",
+      "dateCreated": "2022-05-25 13:34:48.444",
+      "dateStarted": "2022-05-25 14:19:12.772",
+      "dateFinished": "2022-05-25 14:19:12.789",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nWe\u0027re going to simulate the creation of a `Movie` node in the `sourcedb` database, by sending the following CDC event into the `sourceIdMovie` topic:\n\n```\n{\"meta\":{\"timestamp\":1653487560509,\"username\":\"neo4j\",\"txId\":31,\"txEventId\":0,\"txEventsCount\":1,\"operation\":\"created\",\"source\":{\"hostname\":\"neo4j\"}},\"payload\":{\"id\":\"4\",\"before\":null,\"after\":{\"properties\":{\"tagline\":\"\",\"title\":\"The Lord of the Rings - The Two Towers\",\"released\":2002},\"labels\":[\"Movie\"]},\"type\":\"node\"},\"schema\":{\"properties\":{\"tagline\":\"String\",\"title\":\"String\",\"released\":\"Long\"},\"constraints\":[{\"label\":\"Movie\",\"properties\":[\"title\"],\"type\":\"UNIQUE\"}]}}\n```\n\nusing a `kcat` producer:\n\n```\nkcat -P -b localhost:9092 -t sourceIdMovie\n```\n\nand this node should have been created into the `neo4j` database as well",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 14:19:04.878",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eWe\u0026rsquo;re going to simulate the creation of a \u003ccode\u003eMovie\u003c/code\u003e node in the \u003ccode\u003esourcedb\u003c/code\u003e database, by sending the following CDC event into the \u003ccode\u003esourceIdMovie\u003c/code\u003e topic:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\u0026quot;meta\u0026quot;:{\u0026quot;timestamp\u0026quot;:1653487560509,\u0026quot;username\u0026quot;:\u0026quot;neo4j\u0026quot;,\u0026quot;txId\u0026quot;:31,\u0026quot;txEventId\u0026quot;:0,\u0026quot;txEventsCount\u0026quot;:1,\u0026quot;operation\u0026quot;:\u0026quot;created\u0026quot;,\u0026quot;source\u0026quot;:{\u0026quot;hostname\u0026quot;:\u0026quot;neo4j\u0026quot;}},\u0026quot;payload\u0026quot;:{\u0026quot;id\u0026quot;:\u0026quot;4\u0026quot;,\u0026quot;before\u0026quot;:null,\u0026quot;after\u0026quot;:{\u0026quot;properties\u0026quot;:{\u0026quot;tagline\u0026quot;:\u0026quot;\u0026quot;,\u0026quot;title\u0026quot;:\u0026quot;The Lord of the Rings - The Two Towers\u0026quot;,\u0026quot;released\u0026quot;:2002},\u0026quot;labels\u0026quot;:[\u0026quot;Movie\u0026quot;]},\u0026quot;type\u0026quot;:\u0026quot;node\u0026quot;},\u0026quot;schema\u0026quot;:{\u0026quot;properties\u0026quot;:{\u0026quot;tagline\u0026quot;:\u0026quot;String\u0026quot;,\u0026quot;title\u0026quot;:\u0026quot;String\u0026quot;,\u0026quot;released\u0026quot;:\u0026quot;Long\u0026quot;},\u0026quot;constraints\u0026quot;:[{\u0026quot;label\u0026quot;:\u0026quot;Movie\u0026quot;,\u0026quot;properties\u0026quot;:[\u0026quot;title\u0026quot;],\u0026quot;type\u0026quot;:\u0026quot;UNIQUE\u0026quot;}]}}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eusing a \u003ccode\u003ekcat\u003c/code\u003e producer:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -P -b localhost:9092 -t sourceIdMovie\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eand this node should have been created into the \u003ccode\u003eneo4j\u003c/code\u003e database as well\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653486530601_125129771",
+      "id": "paragraph_1653486530601_125129771",
+      "dateCreated": "2022-05-25 13:48:50.601",
+      "dateStarted": "2022-05-25 14:19:04.876",
+      "dateFinished": "2022-05-25 14:19:04.885",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nMATCH (m:Movie:SourceEvent {title: \"The Lord of the Rings - The Two Towers\"}) return m",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-25 14:18:17.436",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "sourceId": "string",
+                      "tagline": "string",
+                      "title": "string",
+                      "released": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/undefined"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":217,\"data\":{\"sourceId\":\"4\",\"tagline\":\"\",\"title\":\"The Lord of the Rings - The Two Towers\",\"released\":2002},\"label\":\"Movie\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\",\"SourceEvent\":\"#E11567\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1653486999906_1957353603",
+      "id": "paragraph_1653486999906_1957353603",
+      "dateCreated": "2022-05-25 13:56:39.906",
+      "dateStarted": "2022-05-25 14:18:15.376",
+      "dateFinished": "2022-05-25 14:18:15.458",
+      "status": "FINISHED"
+    }
+  ],
+  "name": "9. Neo4j Sink Connector - SourceId strategy",
+  "id": "2H52G3TVJ",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview2",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
