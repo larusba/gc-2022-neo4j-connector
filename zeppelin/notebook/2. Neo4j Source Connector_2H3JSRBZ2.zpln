@@ -3,7 +3,8 @@
     {
       "text": "%md\n\n## Create the Source instance\n\nHere is a piece of JSON configuration we\u0027re going to use to create our Neo4j Source connector.\nWe\u0027re going to extract all the `Person` nodes.\n\n```\n{\n  \"name\": \"Neo4jSourceConnector\",\n  \"config\": {\n    \"topic\": \"person\",\n    \"connector.class\": \"streams.kafka.connect.source.Neo4jSourceConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.streaming.poll.interval.msecs\": 5000,\n    \"neo4j.streaming.property\": \"timestamp\",\n    \"neo4j.streaming.from\": \"LAST_COMMITTED\",\n    \"neo4j.enforce.schema\": false,\n    \"neo4j.source.query\": \"MATCH (p:Person) WHERE p.timestamp \u003e $lastCheck RETURN p.name AS name, p.born AS born, p.timestamp AS timestamp\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint (be sure to run the command from the `kafka-connect/config` folder), as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-neo4j-source.json\n```\n",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 15:32:01.679",
+      "dateUpdated": "2022-06-01 15:12:23.015",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -38,14 +39,15 @@
       "jobName": "paragraph_1653471421569_1506660278",
       "id": "paragraph_1653471421569_1506660278",
       "dateCreated": "2022-05-25 09:37:01.569",
-      "dateStarted": "2022-05-25 15:32:01.679",
-      "dateFinished": "2022-05-25 15:32:01.693",
+      "dateStarted": "2022-06-01 15:12:23.019",
+      "dateFinished": "2022-06-01 15:12:23.231",
       "status": "FINISHED"
     },
     {
       "text": "%md\n\nChecking the topics list you will not find the new topic `person` because data does not satisfy our `neo4j.source.query`.\nThe reason is that our nodes don\u0027t have the `timestamp` property.\nSo, let\u0027s add it!",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:39:47.621",
+      "dateUpdated": "2022-06-03 08:53:01.240",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -80,14 +82,129 @@
       "jobName": "paragraph_1653471565849_64615090",
       "id": "paragraph_1653471565849_64615090",
       "dateCreated": "2022-05-25 09:39:25.849",
-      "dateStarted": "2022-05-25 09:39:47.620",
-      "dateFinished": "2022-05-25 09:39:47.643",
+      "dateStarted": "2022-06-03 08:53:01.240",
+      "dateFinished": "2022-06-03 08:53:13.186",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nCREATE INDEX person_timestamp IF NOT EXISTS FOR (p:Person) ON (p.timestamp)",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:02:37.671",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654246368278_157988916",
+      "id": "paragraph_1654246368278_157988916",
+      "dateCreated": "2022-06-03 08:52:48.278",
+      "dateStarted": "2022-06-03 09:02:37.693",
+      "dateFinished": "2022-06-03 09:02:37.901",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nCALL db.indexes()",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:02:53.675",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "name": "string",
+                      "state": "string",
+                      "populationPercent": "string",
+                      "uniqueness": "string",
+                      "type": "string",
+                      "entityType": "string",
+                      "labelsOrTypes": "string",
+                      "properties": "string",
+                      "provider": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tname\tstate\tpopulationPercent\tuniqueness\ttype\tentityType\tlabelsOrTypes\tproperties\tprovider\n1\tindex_343aff4e\tONLINE\t100.0\tNONUNIQUE\tLOOKUP\tNODE\t[]\t[]\ttoken-lookup-1.0\n2\tindex_f7700477\tONLINE\t100.0\tNONUNIQUE\tLOOKUP\tRELATIONSHIP\t[]\t[]\ttoken-lookup-1.0\n4\tmovie_title\tONLINE\t100.0\tUNIQUE\tBTREE\tNODE\t[\"Movie\"]\t[\"title\"]\tnative-btree-1.0\n3\tperson_timestamp\tONLINE\t100.0\tNONUNIQUE\tBTREE\tNODE\t[\"Person\"]\t[\"timestamp\"]\tnative-btree-1.0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654246959193_1829026918",
+      "id": "paragraph_1654246959193_1829026918",
+      "dateCreated": "2022-06-03 09:02:39.194",
+      "dateStarted": "2022-06-03 09:02:52.974",
+      "dateFinished": "2022-06-03 09:02:53.289",
       "status": "FINISHED"
     },
     {
       "text": "%neo4j\nMATCH (n) SET n.timestamp \u003d timestamp()",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:40:01.874",
+      "dateUpdated": "2022-06-01 15:08:25.990",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -105,18 +222,25 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653471587619_296791203",
       "id": "paragraph_1653471587619_296791203",
       "dateCreated": "2022-05-25 09:39:47.619",
-      "status": "READY"
+      "dateStarted": "2022-06-01 15:08:26.019",
+      "dateFinished": "2022-06-01 15:08:26.756",
+      "status": "FINISHED"
     },
     {
       "text": "%md\nNow you will find the topic!!\n\n\nCheck if the new topic has been created:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```\n\nCheck events into `person` topic:\n\n```\nkcat -C -b localhost:9092 -t person\n```",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 09:40:15.906",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -159,6 +283,7 @@
       "text": "%md\nWe should find all the `Person` nodes transformed into events like the following:\n\n```\n...\n\"{\\\"name\\\":\\\"Penny Marshall\\\",\\\"born\\\":1943,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"Paul Blythe\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"Angela Scope\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"Jessica Thompson\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n\"{\\\"name\\\":\\\"James Thompson\\\",\\\"born\\\":null,\\\"timestamp\\\":1652883491606}\"\n```",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 09:40:30.546",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -201,6 +326,7 @@
       "text": "%md\nImagine for example a situation where your Neo4j Source Connector stop working for some reason, and you need to restart it manually.\nNodes and relationship which has been created or updated during this down time are not lost. When you restart the connector it resumes working from the last known offsets!!\n\nLet\u0027s simulate this situation by removing the connector:\n\n```\ncurl -X DELETE http://localhost:8083/connectors/Neo4jSourceConnector\n```",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 15:25:10.764",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -243,6 +369,7 @@
       "text": "%md\nNow create some other `Person` nodes, for example:",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 15:30:18.182",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -284,7 +411,8 @@
     {
       "text": "%neo4j\nMERGE (p:Person {name: \"Orlando Bloom\"}) SET p.born\u003d1977, p.timestamp\u003dtimestamp() RETURN p",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 15:30:20.257",
+      "dateUpdated": "2022-06-01 15:09:29.344",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -339,7 +467,7 @@
         "msg": [
           {
             "type": "NETWORK",
-            "data": "{\"nodes\":[{\"id\":218,\"data\":{\"name\":\"Orlando Bloom\",\"born\":1977,\"timestamp\":1653492620303},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\",\"SourceEvent\":\"#E11567\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+            "data": "{\"nodes\":[{\"id\":171,\"data\":{\"name\":\"Orlando Bloom\",\"born\":\"1977\",\"timestamp\":\"1654096169573\"},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#D9FACC\",\"Person\":\"#54B998\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
           }
         ]
       },
@@ -349,14 +477,15 @@
       "jobName": "paragraph_1653492369404_1908467127",
       "id": "paragraph_1653492369404_1908467127",
       "dateCreated": "2022-05-25 15:26:09.404",
-      "dateStarted": "2022-05-25 15:30:20.277",
-      "dateFinished": "2022-05-25 15:30:20.371",
+      "dateStarted": "2022-06-01 15:09:29.364",
+      "dateFinished": "2022-06-01 15:09:30.711",
       "status": "FINISHED"
     },
     {
       "text": "%neo4j\nMERGE (p:Person {name: \"Ian Holm\"}) SET p.born\u003d1931, p.timestamp\u003dtimestamp() RETURN p",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 15:30:24.539",
+      "dateUpdated": "2022-06-01 15:09:46.215",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -412,7 +541,7 @@
         "msg": [
           {
             "type": "NETWORK",
-            "data": "{\"nodes\":[{\"id\":219,\"data\":{\"name\":\"Ian Holm\",\"born\":1931,\"timestamp\":1653492622299},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\",\"SourceEvent\":\"#E11567\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+            "data": "{\"nodes\":[{\"id\":172,\"data\":{\"name\":\"Ian Holm\",\"born\":\"1931\",\"timestamp\":\"1654096186407\"},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#D9FACC\",\"Person\":\"#54B998\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
           }
         ]
       },
@@ -422,14 +551,15 @@
       "jobName": "paragraph_1653492507512_516744253",
       "id": "paragraph_1653492507512_516744253",
       "dateCreated": "2022-05-25 15:28:27.512",
-      "dateStarted": "2022-05-25 15:30:22.270",
-      "dateFinished": "2022-05-25 15:30:22.330",
+      "dateStarted": "2022-06-01 15:09:46.238",
+      "dateFinished": "2022-06-01 15:09:46.584",
       "status": "FINISHED"
     },
     {
       "text": "%md\nIf you check the content of `person` topic via `kcat` consumer you will discover that these 2 nodes has not been reflected:\n\n```\nkcat -C -b localhost:9092 -t person\n```\n\nNow, restarting the Neo4j Source connector:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-neo4j-source.json\n```\n\nyou will find the expected events:\n\n```\n\"{\\\"name\\\":\\\"Orlando Bloom\\\",\\\"born\\\":1977,\\\"timestamp\\\":1653492620303}\"\n\"{\\\"name\\\":\\\"Ian Holm\\\",\\\"born\\\":1931,\\\"timestamp\\\":1653492622299}\"\n```",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 15:33:03.862",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,

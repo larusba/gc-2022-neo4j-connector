@@ -12,6 +12,7 @@
     "neo4j.authentication.basic.username": "neo4j",
     "neo4j.authentication.basic.password": "password",
     "neo4j.encryption.enabled": false,
-    "neo4j.topic.cdc.schema": "sourcedb"
+    "neo4j.topic.cdc.schema": "sourcedb",
+    "neo4j.database": "targetdb"
   }
 }

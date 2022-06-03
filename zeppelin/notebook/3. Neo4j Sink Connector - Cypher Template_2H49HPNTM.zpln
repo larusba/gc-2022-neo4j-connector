@@ -4,6 +4,7 @@
       "text": "%md\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Cypher template strategy.\nWe’re going to create `Movie` nodes based on the events we\u0027ll send into the related topic: \n\n## Create the Sink instance\n\n```\n{\n  \"name\": \"Neo4jSinkConnector\",\n  \"config\": {\n    \"topics\": \"movie\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"kafka.bootstrap.servers\": \"broker:9093\",\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cypher.movie\": \"MERGE (m:Movie {title: event.title}) SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp() RETURN m\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cypher.json\n```\n\nIf you want to verify the active connectors just run:\n\n```\ncurl -X GET http://localhost:8083/connectors\n```\n\nNow our topics list should include also our new `movie` topic. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 09:41:58.374",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -43,9 +44,194 @@
       "status": "FINISHED"
     },
     {
-      "text": "%md\nby creating a Kafkacat produer:\n\n```\nkcat -b localhost:9092 -t movie -P -D\\n\n```\n\nLet\u0027s send the following event into the `movie` topic:\n\n```\n{\"title\": \"The Lord of the Rings - The Fellowship of the Ring\", \"released\": \"2001\", \"tagline\": \"\"}\n```\n\nType `ctrl+D` to close the `kcat` producer.",
+      "text": "%md\nBefore sending our first message is important that our query is fully optimized so execute the following query in the [Neo4j Browser](http://localhost:7474)\n\n```cypher\nEXPLAIN \nWITH {} AS event\nMERGE (m:Movie {title: event.title})\n    SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp()\nRETURN m\n```",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:42:17.165",
+      "dateUpdated": "2022-06-03 09:01:22.331",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eBefore sending our first message is important that our query is fully optimized so execute the following query in the \u003ca href\u003d\"http://localhost:7474\"\u003eNeo4j Browser\u003c/a\u003e\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"language-cypher\"\u003eEXPLAIN \nWITH {} AS event\nMERGE (m:Movie {title: event.title})\n    SET m.released\u003devent.released, m.tagline\u003devent.tagline, m.timestamp\u003dtimestamp()\nRETURN m\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654246413170_1202981688",
+      "id": "paragraph_1654246413170_1202981688",
+      "dateCreated": "2022-06-03 08:53:33.171",
+      "dateStarted": "2022-06-03 09:01:22.327",
+      "dateFinished": "2022-06-03 09:01:22.556",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nNow to optimize the query we need to define a constraint over `:Movie{title}`\n",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 08:58:12.855",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654246645678_527234304",
+      "id": "paragraph_1654246645678_527234304",
+      "dateCreated": "2022-06-03 08:57:25.678",
+      "status": "READY"
+    },
+    {
+      "text": "%neo4j\nCREATE CONSTRAINT movie_title IF NOT EXISTS FOR (m:Movie) REQUIRE (m.title) IS UNIQUE",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:03:15.643",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654246692936_916171092",
+      "id": "paragraph_1654246692936_916171092",
+      "dateCreated": "2022-06-03 08:58:12.937",
+      "dateStarted": "2022-06-03 09:03:15.660",
+      "dateFinished": "2022-06-03 09:03:15.812",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\nshow constraints",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:03:22.815",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "name": "string",
+                      "type": "string",
+                      "entityType": "string",
+                      "labelsOrTypes": "string",
+                      "properties": "string",
+                      "ownedIndexId": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tname\ttype\tentityType\tlabelsOrTypes\tproperties\townedIndexId\n5\tmovie_title\tUNIQUENESS\tNODE\t[\"Movie\"]\t[\"title\"]\t4\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654246997900_1066381803",
+      "id": "paragraph_1654246997900_1066381803",
+      "dateCreated": "2022-06-03 09:03:17.923",
+      "dateStarted": "2022-06-03 09:03:22.254",
+      "dateFinished": "2022-06-03 09:03:22.529",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nby creating a Kafkacat produer:\n\n```\nkcat -b localhost:9092 -t movie -P\n```\n\nLet\u0027s send the following event into the `movie` topic:\n\n```\n{\"title\": \"The Lord of the Rings - The Fellowship of the Ring\", \"released\": \"2001\", \"tagline\": \"One ring to rule them all\"}\n```\n\nType `ctrl+D` to close the `kcat` producer and effectively send the messages to the topic.",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-01 15:40:48.713",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -70,7 +256,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eby creating a Kafkacat produer:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -b localhost:9092 -t movie -P -D\\n\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eLet\u0026rsquo;s send the following event into the \u003ccode\u003emovie\u003c/code\u003e topic:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\u0026quot;title\u0026quot;: \u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;, \u0026quot;released\u0026quot;: \u0026quot;2001\u0026quot;, \u0026quot;tagline\u0026quot;: \u0026quot;\u0026quot;}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eType \u003ccode\u003ectrl+D\u003c/code\u003e to close the \u003ccode\u003ekcat\u003c/code\u003e producer.\u003c/p\u003e\n\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eby creating a Kafkacat produer:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -b localhost:9092 -t movie -P\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eLet\u0026rsquo;s send the following event into the \u003ccode\u003emovie\u003c/code\u003e topic:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\u0026quot;title\u0026quot;: \u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;, \u0026quot;released\u0026quot;: \u0026quot;2001\u0026quot;, \u0026quot;tagline\u0026quot;: \u0026quot;One ring to rule them all\u0026quot;}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eType \u003ccode\u003ectrl+D\u003c/code\u003e to close the \u003ccode\u003ekcat\u003c/code\u003e producer and effectively send the messages to the topic.\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
@@ -80,14 +266,15 @@
       "jobName": "paragraph_1653471718372_767623947",
       "id": "paragraph_1653471718372_767623947",
       "dateCreated": "2022-05-25 09:41:58.372",
-      "dateStarted": "2022-05-25 09:42:17.162",
-      "dateFinished": "2022-05-25 09:42:17.173",
+      "dateStarted": "2022-06-01 15:40:48.680",
+      "dateFinished": "2022-06-01 15:40:48.986",
       "status": "FINISHED"
     },
     {
       "text": "%md\nNow we should find our new `Movie` node into the graph",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 09:42:30.143",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -129,12 +316,47 @@
     {
       "text": "%neo4j\nmatch (m:Movie {title:\"The Lord of the Rings - The Fellowship of the Ring\"}) return m",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:42:40.716",
+      "dateUpdated": "2022-06-03 08:50:52.668",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
-        "results": {},
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "tagline": "string",
+                      "title": "string",
+                      "released": "string",
+                      "timestamp": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
         "editorSetting": {
           "language": "markdown",
           "editOnDblClick": false,
@@ -147,16 +369,43 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":171,\"data\":{\"tagline\":\"One ring to rule them all\",\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\",\"timestamp\":\"1654246250936\"},\"label\":\"Movie\"}],\"edges\":[],\"labels\":{\"Movie\":\"#5BB17B\",\"Person\":\"#4B9385\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+          }
+        ]
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653471750141_1136779395",
       "id": "paragraph_1653471750141_1136779395",
       "dateCreated": "2022-05-25 09:42:30.141",
+      "dateStarted": "2022-06-03 08:50:52.696",
+      "dateFinished": "2022-06-03 08:50:54.467",
+      "status": "FINISHED"
+    },
+    {
+      "user": "anonymous",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654097781916_1993341946",
+      "id": "paragraph_1654097781916_1993341946",
+      "dateCreated": "2022-06-01 15:36:21.916",
       "status": "READY"
     }
   ],
-  "name": "Kafka Connect Sink Connector - Cypher Template",
+  "name": "3. Neo4j Sink Connector - Cypher Template",
   "id": "2H49HPNTM",
   "defaultInterpreterGroup": "spark",
   "version": "0.9.0-preview2",

@@ -413,6 +413,71 @@
         "isUserImpersonate": false
       }
     },
+    "neo4jTargetDb": {
+      "id": "neo4jTargetDb",
+      "name": "neo4jTargetDb",
+      "group": "neo4j",
+      "properties": {
+        "neo4j.url": {
+          "name": "neo4j.url",
+          "value": "bolt://neo4j:7687",
+          "type": "textarea",
+          "description": "The Neo4j\u0027s BOLT url."
+        },
+        "neo4j.database": {
+          "name": "neo4j.database",
+          "value": "targetdb",
+          "type": "textarea",
+          "description": "The Neo4j target database, if empty use the dafault db."
+        },
+        "neo4j.auth.type": {
+          "name": "neo4j.auth.type",
+          "value": "BASIC",
+          "type": "textarea",
+          "description": "The Neo4j\u0027s authentication type (NONE, BASIC)."
+        },
+        "neo4j.auth.user": {
+          "name": "neo4j.auth.user",
+          "value": "neo4j",
+          "type": "textarea",
+          "description": "The Neo4j user name."
+        },
+        "neo4j.auth.password": {
+          "name": "neo4j.auth.password",
+          "value": "password",
+          "type": "textarea",
+          "description": "The Neo4j user password."
+        },
+        "neo4j.max.concurrency": {
+          "name": "neo4j.max.concurrency",
+          "value": "50",
+          "type": "textarea",
+          "description": "Max concurrency call from Zeppelin to Neo4j server."
+        }
+      },
+      "status": "READY",
+      "interpreterGroup": [
+        {
+          "name": "neo4j",
+          "class": "org.apache.zeppelin.graph.neo4j.Neo4jCypherInterpreter",
+          "defaultInterpreter": false,
+          "editor": {
+            "editOnDblClick": false
+          }
+        }
+      ],
+      "dependencies": [],
+      "option": {
+        "remote": true,
+        "port": -1,
+        "perNote": "shared",
+        "perUser": "shared",
+        "isExistingProcess": false,
+        "setPermission": false,
+        "owners": [],
+        "isUserImpersonate": false
+      }
+    },
     "pig": {
       "id": "pig",
       "name": "pig",
@@ -531,7 +596,7 @@
       "name": "java",
       "group": "java",
       "properties": {},
-      "status": "DOWNLOADING_DEPENDENCIES",
+      "status": "READY",
       "interpreterGroup": [
         {
           "name": "java",
@@ -576,6 +641,41 @@
             "editOnDblClick": false,
             "completionKey": "TAB",
             "completionSupport": true
+          }
+        }
+      ],
+      "dependencies": [],
+      "option": {
+        "remote": true,
+        "port": -1,
+        "isExistingProcess": false,
+        "setPermission": false,
+        "owners": [],
+        "isUserImpersonate": false
+      }
+    },
+    "spark-submit": {
+      "id": "spark-submit",
+      "name": "spark-submit",
+      "group": "spark-submit",
+      "properties": {
+        "SPARK_HOME": {
+          "name": "SPARK_HOME",
+          "value": "",
+          "type": "string",
+          "description": "Location of spark distribution"
+        }
+      },
+      "status": "READY",
+      "interpreterGroup": [
+        {
+          "name": "submit",
+          "class": "org.apache.zeppelin.spark.submit.SparkSubmitInterpreter",
+          "defaultInterpreter": true,
+          "editor": {
+            "language": "sh",
+            "editOnDblClick": false,
+            "completionSupport": false
           }
         }
       ],
@@ -1407,7 +1507,7 @@
           "name": "neo4j.database",
           "value": "sourcedb",
           "type": "textarea",
-          "description": "The neo4j target database, if empty use the dafault db."
+          "description": "The Neo4j target database, if empty use the dafault db."
         },
         "neo4j.auth.type": {
           "name": "neo4j.auth.type",
@@ -1903,6 +2003,41 @@
         "isUserImpersonate": false
       }
     },
+    "flink-cmd": {
+      "id": "flink-cmd",
+      "name": "flink-cmd",
+      "group": "flink-cmd",
+      "properties": {
+        "FLINK_HOME": {
+          "name": "FLINK_HOME",
+          "value": "",
+          "type": "string",
+          "description": "Location of flink distribution"
+        }
+      },
+      "status": "READY",
+      "interpreterGroup": [
+        {
+          "name": "cmd",
+          "class": "org.apache.zeppelin.flink.cmd.FlinkCmdInterpreter",
+          "defaultInterpreter": false,
+          "editor": {
+            "language": "sh",
+            "editOnDblClick": false,
+            "completionSupport": false
+          }
+        }
+      ],
+      "dependencies": [],
+      "option": {
+        "remote": true,
+        "port": -1,
+        "isExistingProcess": false,
+        "setPermission": false,
+        "owners": [],
+        "isUserImpersonate": false
+      }
+    },
     "scalding": {
       "id": "scalding",
       "name": "scalding",
@@ -1980,53 +2115,11 @@
           "type": "number",
           "description": "Port of running JobManager. Only used for remote mode"
         },
-        "flink.jm.memory": {
-          "name": "flink.jm.memory",
-          "value": "1024",
-          "type": "number",
-          "description": "Memory for JobManager (mb)"
-        },
-        "flink.tm.memory": {
-          "name": "flink.tm.memory",
-          "value": "1024",
-          "type": "number",
-          "description": "Memory for TaskManager (mb)"
-        },
-        "flink.tm.slot": {
-          "name": "flink.tm.slot",
-          "value": "1",
-          "type": "number",
-          "description": "Number of slot per TaskManager"
-        },
         "local.number-taskmanager": {
           "name": "local.number-taskmanager",
           "value": "4",
           "type": "number",
           "description": "Number of TaskManager in local mode"
-        },
-        "flink.yarn.appName": {
-          "name": "flink.yarn.appName",
-          "value": "Zeppelin Flink Session",
-          "type": "string",
-          "description": "Yarn app name"
-        },
-        "flink.yarn.queue": {
-          "name": "flink.yarn.queue",
-          "value": "default",
-          "type": "string",
-          "description": "Yarn queue name"
-        },
-        "flink.webui.yarn.useProxy": {
-          "name": "flink.webui.yarn.useProxy",
-          "value": false,
-          "type": "checkbox",
-          "description": "Whether use yarn proxy url as flink weburl, e.g. http://localhost:8088/proxy/application_1583396598068_0004"
-        },
-        "flink.webui.yarn.address": {
-          "name": "flink.webui.yarn.address",
-          "value": "",
-          "type": "string",
-          "description": "Set this value only when your yarn address is mapped to some other address, e.g. some cloud vender will map `http://resource-manager:8088` to `https://xxx-yarn.yy.cn/gateway/kkk/yarn`"
         },
         "flink.udf.jars": {
           "name": "flink.udf.jars",
@@ -2117,6 +2210,41 @@
           "value": "10",
           "type": "number",
           "description": "Max concurrent sql of Stream Sql"
+        },
+        "flink.jm.memory": {
+          "name": "flink.jm.memory",
+          "value": "1024",
+          "type": "number"
+        },
+        "flink.tm.memory": {
+          "name": "flink.tm.memory",
+          "value": "1024",
+          "type": "number"
+        },
+        "flink.tm.slot": {
+          "name": "flink.tm.slot",
+          "value": "1",
+          "type": "number"
+        },
+        "flink.yarn.appName": {
+          "name": "flink.yarn.appName",
+          "value": "Zeppelin Flink Session",
+          "type": "string"
+        },
+        "flink.yarn.queue": {
+          "name": "flink.yarn.queue",
+          "value": "default",
+          "type": "string"
+        },
+        "flink.webui.yarn.useProxy": {
+          "name": "flink.webui.yarn.useProxy",
+          "value": false,
+          "type": "checkbox"
+        },
+        "flink.webui.yarn.address": {
+          "name": "flink.webui.yarn.address",
+          "value": "",
+          "type": "string"
         }
       },
       "status": "READY",
@@ -2601,7 +2729,7 @@
           "name": "neo4j.database",
           "value": "neo4j",
           "type": "string",
-          "description": "The neo4j target database, if empty use the dafault db."
+          "description": "The Neo4j target database, if empty use the dafault db."
         },
         "neo4j.auth.type": {
           "name": "neo4j.auth.type",
@@ -2864,13 +2992,13 @@
           "name": "cassandra.format.float_precision",
           "value": "5",
           "type": "number",
-          "description": "Precision for formatting of float columns"
+          "description": "Precision for formatting of float values"
         },
         "cassandra.format.double_precision": {
           "name": "cassandra.format.double_precision",
           "value": "12",
           "type": "number",
-          "description": "Precision for formatting of double columns"
+          "description": "Precision for formatting of double values"
         }
       },
       "status": "READY",
@@ -3024,6 +3152,27 @@
       "id": "central",
       "type": "default",
       "url": "https://repo1.maven.org/maven2/",
+      "host": "repo1.maven.org",
+      "protocol": "https",
+      "releasePolicy": {
+        "enabled": true,
+        "updatePolicy": "daily",
+        "checksumPolicy": "warn"
+      },
+      "snapshotPolicy": {
+        "enabled": true,
+        "updatePolicy": "daily",
+        "checksumPolicy": "warn"
+      },
+      "mirroredRepositories": [],
+      "repositoryManager": false
+    },
+    {
+      "id": "local",
+      "type": "default",
+      "url": "file:///opt/zeppelin/.m2/repository",
+      "host": "",
+      "protocol": "file",
       "releasePolicy": {
         "enabled": true,
         "updatePolicy": "daily",

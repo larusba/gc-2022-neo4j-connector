@@ -8,16 +8,15 @@ services:
   zeppelin:
     hostname: zeppelin
     container_name: zeppelin
-    image: larusefraudy/zeppelin:0.9.0
+    image: apache/zeppelin:0.10.1
     depends_on:
       - neo4j
     ports:
       - "8080:8080"
       - "4040:4040"
     volumes:
-      - ./zeppelin/notebook:/zeppelin/notebook
-      - ./zeppelin/conf:/zeppelin/conf
-      - ./zeppelin/interpreter/neo4j:/zeppelin/interpreter/neo4j
+      - ./zeppelin/notebook:/opt/zeppelin/notebook
+      - ./zeppelin/conf:/opt/zeppelin/conf
     networks:
       - GraphConnect2022
 
@@ -44,6 +43,7 @@ services:
       NEO4J_streams_source_enabled: "false"
       NEO4J_streams_source_enabled_from_sourcedb: "true"
       NEO4J_streams_sink_enabled: "false"
+      NEO4J_streams_source_schema_polling_interval: 5000
     networks:
       - GraphConnect2022
 

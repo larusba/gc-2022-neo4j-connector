@@ -4,6 +4,7 @@
       "text": "%md\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the CUD File Format strategy.\n\n```\n{\n  \"name\": \"Neo4jSinkConnectorCud\",\n  \"config\": {\n    \"topics\": \"cudPersonNode,cudActedInRel\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cud\": \"cudPersonNode;cudActedInRel\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cud.json\n```\n\nNow our topics list should include also our new `cudPersonNode` and `cudActedInRel` topics. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 10:21:45.586",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -45,7 +46,8 @@
     {
       "text": "%md\nLet\u0027s send the following event \n\n```\n{ \"op\": \"merge\", \"properties\": { \"born\": 1959 }, \"ids\": {\"name\": \"Sean Bean\"}, \"labels\": [\"Person\"], \"type\": \"node\" }\n```\n\ninto the `cudPersonNode` topic via `kcat` producer:\n\n```\nkcat -P -b localhost:9092 -t cudPersonNode\n```\n\nWith the provided CUD format, the node that is going to be created will be a `Person` node with `name` as key and `born` as property.\n\nLet\u0027s check it out by running the query in the next paragraph",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 10:23:06.825",
+      "dateUpdated": "2022-06-03 10:03:31.392",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -58,8 +60,8 @@
           "completionSupport": false
         },
         "editorMode": "ace/mode/markdown",
-        "editorHide": true,
-        "tableHide": false
+        "editorHide": false,
+        "tableHide": true
       },
       "settings": {
         "params": {},
@@ -87,7 +89,8 @@
     {
       "text": "%neo4j\nMATCH (p:Person {name: \"Sean Bean\"}) RETURN p",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 11:03:30.735",
+      "dateUpdated": "2022-06-03 10:03:18.802",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -142,7 +145,7 @@
         "msg": [
           {
             "type": "NETWORK",
-            "data": "{\"nodes\":[{\"id\":180,\"data\":{\"name\":\"Sean Bean\",\"born\":1959},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+            "data": "{\"nodes\":[{\"id\":173,\"data\":{\"name\":\"Sean Bean\",\"born\":\"1959\"},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Movie\":\"#5BB17B\",\"Person\":\"#4B9385\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
           }
         ]
       },
@@ -152,14 +155,15 @@
       "jobName": "paragraph_1653474186820_635166199",
       "id": "paragraph_1653474186820_635166199",
       "dateCreated": "2022-05-25 10:23:06.820",
-      "dateStarted": "2022-05-25 11:03:30.753",
-      "dateFinished": "2022-05-25 11:03:30.797",
+      "dateStarted": "2022-06-03 10:03:18.822",
+      "dateFinished": "2022-06-03 10:03:19.179",
       "status": "FINISHED"
     },
     {
       "text": "%md\nLet\u0027s send the following event \n\n```\n{ \"op\": \"create\", \"properties\": { \"roles\": \"Boromir\" }, \"rel_type\": \"ACTED_IN\", \"from\": { \"ids\": {\"name\": \"Sean Bean\"}, \"labels\": [\"Person\"] }, \"to\": { \"ids\": {\"title\": \"The Lord of the Rings - The Fellowship of the Ring\"}, \"labels\": [\"Movie\"] }, \"type\":\"relationship\" }\n```\n\ninto the `cudActedInRel` topic via `kcat` producer:\n\n```\nkcat -P -b localhost:9092 -t cudActedInRel\n```\n\nWith the provided CUD format, the relationship that is going to be created will be a `ACTED_IN` relationship, with `roles` as property, between a `Person` node and a `Movie` node.\n\nLet\u0027s check it out by running the query in the next paragraph",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 11:04:25.504",
+      "dateUpdated": "2022-06-03 10:12:47.393",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -194,14 +198,15 @@
       "jobName": "paragraph_1653475906914_93029632",
       "id": "paragraph_1653475906914_93029632",
       "dateCreated": "2022-05-25 10:51:46.914",
-      "dateStarted": "2022-05-25 11:04:25.503",
-      "dateFinished": "2022-05-25 11:04:25.516",
+      "dateStarted": "2022-06-03 10:12:47.392",
+      "dateFinished": "2022-06-03 10:12:47.586",
       "status": "FINISHED"
     },
     {
-      "text": "%neo4j\nMATCH (p:Person {name:\"Sean Bean\"}) MATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"}) MATCH (p)-[r:ACTED_IN]-\u003e(m) RETURN p,r,m",
+      "text": "%neo4j\nMATCH (p:Person {name:\"Sean Bean\"})\nMATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"})\nMATCH (p)-[r:ACTED_IN]-\u003e(m)\nRETURN p,r,m",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 11:04:31.582",
+      "dateUpdated": "2022-06-03 10:13:15.648",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -260,7 +265,7 @@
         "msg": [
           {
             "type": "NETWORK",
-            "data": "{\"nodes\":[{\"id\":180,\"data\":{\"name\":\"Sean Bean\",\"born\":1959},\"label\":\"Person\"},{\"id\":171,\"data\":{\"tagline\":\"\",\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":2001},\"label\":\"Movie\"}],\"edges\":[{\"source\":180,\"target\":171,\"id\":255,\"data\":{\"roles\":\"Boromir\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Movie\":\"#A907A1\",\"Person\":\"#E1A860\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
+            "data": "{\"nodes\":[{\"id\":171,\"data\":{\"tagline\":\"One ring to rule them all\",\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"},{\"id\":173,\"data\":{\"name\":\"Sean Bean\",\"city\":\"Handsworth\",\"born\":\"1959\"},\"label\":\"Person\"}],\"edges\":[{\"source\":173,\"target\":171,\"id\":254,\"data\":{\"roles\":\"Boromir\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Movie\":\"#5BB17B\",\"Person\":\"#4B9385\"},\"types\":[\"ACTED_IN\",\"REVIEWED\",\"PRODUCED\",\"WROTE\",\"FOLLOWS\",\"DIRECTED\"],\"directed\":true}"
           }
         ]
       },
@@ -270,12 +275,30 @@
       "jobName": "paragraph_1653475917124_961319735",
       "id": "paragraph_1653475917124_961319735",
       "dateCreated": "2022-05-25 10:51:57.125",
-      "dateStarted": "2022-05-25 11:04:29.234",
-      "dateFinished": "2022-05-25 11:04:29.284",
+      "dateStarted": "2022-06-03 10:13:15.664",
+      "dateFinished": "2022-06-03 10:13:16.332",
       "status": "FINISHED"
+    },
+    {
+      "text": "%neo4j\n",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 10:13:15.663",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654251195662_1361947331",
+      "id": "paragraph_1654251195662_1361947331",
+      "dateCreated": "2022-06-03 10:13:15.663",
+      "status": "READY"
     }
   ],
-  "name": "Neo4j Sink Connector - CUD File Format",
+  "name": "7. Neo4j Sink Connector - CUD File Format",
   "id": "2H4GUNJ5R",
   "defaultInterpreterGroup": "spark",
   "version": "0.9.0-preview2",

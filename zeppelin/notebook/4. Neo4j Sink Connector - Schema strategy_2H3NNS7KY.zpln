@@ -1,9 +1,10 @@
 {
   "paragraphs": [
     {
-      "text": "%md\nAs we said, this strategy is generally used to migrate from a Neo4j on-premise instance to a Neo4j Aura instance. \nJust for test purposes we\u0027re going to create a new `sourcedb` database we\u0027ll use as source database.\n\nOn our `neo4j` Docker container we\u0027ve already setup Neo4j Streams enabling the source module on the `sourcedb` database.\n\n```\n  neo4j:\n    platform: linux/amd64\n    image: neo4j:4.4-enterprise\n    hostname: neo4j\n    container_name: neo4j\n    ports:\n      - 7474:7474\n      - 7687:7687\n    depends_on:\n      - zookeeper\n      - broker\n    volumes:\n      - ./neo4j/plugins:/plugins\n    environment:\n      NEO4J_ACCEPT_LICENSE_AGREEMENT: \"yes\"\n      NEO4J_AUTH: neo4j/password\n      NEO4J_dbms_memory_heap_max__size: 2G\n      NEO4J_dbms_logs_debug_level: DEBUG\n      NEO4J_kafka_zookeeper_connect: zookeeper:2181\n      NEO4J_kafka_bootstrap_servers: broker:9093\n      NEO4J_streams_source_enabled: \"false\"\n      NEO4J_streams_source_enabled_from_sourcedb: \"true\"\n      NEO4J_streams_sink_enabled: \"false\"\n```\n\nBy default the plugin will redirect all created nodes and relationships, in the form of CDC events, on a default topic with the same name as the database. \n\nHere is an example of a CDC node event:\n\n```\n{\n  \"meta\": {\n    \"timestamp\": 1532597182604,\n    \"username\": \"neo4j\",\n    \"tx_id\": 3,\n    \"tx_event_id\": 0,\n    \"tx_events_count\": 2,\n    \"operation\": \"created\",\n    \"source\": {\n      \"hostname\": \"neo4j.mycompany.com\"\n    }\n  },\n  \"payload\": {\n    \"id\": \"1004\",\n    \"type\": \"node\",\n    \"after\": {\n      \"labels\": [\"Person\"],\n      \"properties\": {\n        \"email\": \"annek@noanswer.org\",\n        \"last_name\": \"Kretchmar\",\n        \"first_name\": \"Anne Marie\"\n      }\n    }\n  },\n  \"schema\": {\n    \"properties\": {\n      \"last_name\": \"String\",\n      \"email\": \"String\",\n      \"first_name\": \"String\"\n    },\n    \"constraints\": [{\n      \"label\": \"Person\",\n      \"properties\": [\"first_name\", \"last_name\"],\n      \"type\": \"UNIQUE\"\n    }]\n  }\n}\n```\n\nleveraging the `schema` field (no extra field will be created), this event will be persisted as the following node:\n\n\n```\nPerson{first_name: \"Anne Marie\", last_name: \"Kretchmar\", email: \"annek@noanswer.org\"}\n```\n\nHere is an example a CDC relationship event:\n\n```\n{\n  \"meta\": {\n    \"timestamp\": 1532597182604,\n    \"username\": \"neo4j\",\n    \"tx_id\": 3,\n    \"tx_event_id\": 0,\n    \"tx_events_count\": 2,\n    \"operation\": \"created\",\n    \"source\": {\n      \"hostname\": \"neo4j.mycompany.com\"\n    }\n  },\n  \"payload\": {\n    \"id\": \"123\",\n    \"type\": \"relationship\",\n    \"label\": \"KNOWS\",\n    \"start\": {\n      \"labels\": [\"Person\"],\n      \"id\": \"123\",\n      \"ids\": {\n        \"last_name\": \"Andrea\",\n        \"first_name\": \"Santurbano\"\n      }\n    },\n    \"end\": {\n      \"labels\": [\"Person\"],\n      \"id\": \"456\",\n      \"ids\": {\n        \"last_name\": \"Michael\",\n        \"first_name\": \"Hunger\"\n      }\n    },\n    \"after\": {\n      \"properties\": {\n        \"since\": \"2018-04-05T12:34:00[Europe/Berlin]\"\n      }\n    }\n  },\n  \"schema\": {\n    \"properties\": {\n      \"since\": \"ZonedDateTime\"\n    },\n    \"constraints\": [{\n      \"label\": \"KNOWS\",\n      \"properties\": [\"since\"],\n      \"type\": \"RELATIONSHIP_PROPERTY_EXISTS\"\n    }]\n  }\n}\n```\n\nleveraging the `ids` field (no extra field will be created), this event will be persisted as the following relationship:\n\n```\n(:Person {first_name: \"Andrea\", last_name: \"Santurbano\"})-[:KNOWS {since: \"2018-04-05T12:34:00[Europe/Berlin]\"}]-\u003e(:Person {first_name: \"Michael\", last_name: \"Hunger\"})\n```",
+      "text": "%md\nAs we said, this strategy is generally used to migrate from a Neo4j on-premise instance to a Neo4j Aura instance. \nJust for test purposes we\u0027re going to create a new `sourcedb` database we\u0027ll use as source database.\n\nOn our `neo4j` Docker container we\u0027ve already setup Neo4j Streams enabling the source module on the `sourcedb` database.\n\n```\n  neo4j:\n    platform: linux/amd64\n    image: neo4j:4.4-enterprise\n    hostname: neo4j\n    container_name: neo4j\n    ports:\n      - 7474:7474\n      - 7687:7687\n    depends_on:\n      - zookeeper\n      - broker\n    volumes:\n      - ./neo4j/plugins:/plugins\n    environment:\n      NEO4J_ACCEPT_LICENSE_AGREEMENT: \"yes\"\n      NEO4J_AUTH: neo4j/password\n      NEO4J_dbms_memory_heap_max__size: 2G\n      NEO4J_dbms_logs_debug_level: DEBUG\n      NEO4J_kafka_zookeeper_connect: zookeeper:2181\n      NEO4J_kafka_bootstrap_servers: broker:9093\n      NEO4J_streams_source_enabled: \"false\"\n      NEO4J_streams_source_enabled_from_sourcedb: \"true\"\n      NEO4J_streams_sink_enabled: \"false\"\n```\n\nBy default the plugin will redirect all created nodes and relationships, in the form of CDC events, on a default topic with the same name as the database. \n\nHere is an example of a CDC node event:\n\n```\n{\n  \"meta\": {\n    \"timestamp\": 1532597182604,\n    \"username\": \"neo4j\",\n    \"tx_id\": 3,\n    \"txEventId\": 0,\n    \"txEventsCount\": 2,\n    \"operation\": \"created\",\n    \"source\": {\n      \"hostname\": \"neo4j.mycompany.com\"\n    }\n  },\n  \"payload\": {\n    \"id\": \"1004\",\n    \"type\": \"node\",\n    \"before\": null,\n    \"after\": {\n      \"labels\": [\"Person\"],\n      \"properties\": {\n        \"email\": \"annek@noanswer.org\",\n        \"last_name\": \"Kretchmar\",\n        \"first_name\": \"Anne Marie\"\n      }\n    }\n  },\n  \"schema\": {\n    \"properties\": {\n      \"last_name\": \"String\",\n      \"email\": \"String\",\n      \"first_name\": \"String\"\n    },\n    \"constraints\": [{\n      \"label\": \"Person\",\n      \"properties\": [\"first_name\", \"last_name\"],\n      \"type\": \"UNIQUE\"\n    }]\n  }\n}\n```\n\nleveraging the `schema` field (no extra field will be created), this event will be persisted as the following node:\n\n\n```\nPerson{first_name: \"Anne Marie\", last_name: \"Kretchmar\", email: \"annek@noanswer.org\"}\n```\n\nHere is an example a CDC relationship event:\n\n```\n{\n  \"meta\": {\n    \"timestamp\": 1532597182604,\n    \"username\": \"neo4j\",\n    \"txId\": 3,\n    \"txEventId\": 0,\n    \"txEventsCount\": 2,\n    \"operation\": \"created\",\n    \"source\": {\n      \"hostname\": \"neo4j.mycompany.com\"\n    }\n  },\n  \"payload\": {\n    \"id\": \"123\",\n    \"type\": \"relationship\",\n    \"label\": \"KNOWS\",\n    \"start\": {\n      \"labels\": [\"Person\"],\n      \"id\": \"123\",\n      \"ids\": {\n        \"last_name\": \"Andrea\",\n        \"first_name\": \"Santurbano\"\n      }\n    },\n    \"end\": {\n      \"labels\": [\"Person\"],\n      \"id\": \"456\",\n      \"ids\": {\n        \"last_name\": \"Michael\",\n        \"first_name\": \"Hunger\"\n      }\n    },\n    \"before\": null,\n    \"after\": {\n      \"properties\": {\n        \"since\": \"2018-04-05T12:34:00[Europe/Berlin]\"\n      }\n    }\n  },\n  \"schema\": {\n    \"properties\": {\n      \"since\": \"ZonedDateTime\"\n    },\n    \"constraints\": [{\n      \"label\": \"KNOWS\",\n      \"properties\": [\"since\"],\n      \"type\": \"RELATIONSHIP_PROPERTY_EXISTS\"\n    }]\n  }\n}\n```\n\nleveraging the `ids` field (no extra field will be created), this event will be persisted as the following relationship:\n\n```\n(:Person {first_name: \"Andrea\", last_name: \"Santurbano\"})-[:KNOWS {since: \"2018-04-05T12:34:00[Europe/Berlin]\"}]-\u003e(:Person {first_name: \"Michael\", last_name: \"Hunger\"})\n```",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:44:56.010",
+      "dateUpdated": "2022-06-01 16:59:41.068",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -28,7 +29,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eAs we said, this strategy is generally used to migrate from a Neo4j on-premise instance to a Neo4j Aura instance.\u003cbr /\u003e\nJust for test purposes we\u0026rsquo;re going to create a new \u003ccode\u003esourcedb\u003c/code\u003e database we\u0026rsquo;ll use as source database.\u003c/p\u003e\n\u003cp\u003eOn our \u003ccode\u003eneo4j\u003c/code\u003e Docker container we\u0026rsquo;ve already setup Neo4j Streams enabling the source module on the \u003ccode\u003esourcedb\u003c/code\u003e database.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e  neo4j:\n    platform: linux/amd64\n    image: neo4j:4.4-enterprise\n    hostname: neo4j\n    container_name: neo4j\n    ports:\n      - 7474:7474\n      - 7687:7687\n    depends_on:\n      - zookeeper\n      - broker\n    volumes:\n      - ./neo4j/plugins:/plugins\n    environment:\n      NEO4J_ACCEPT_LICENSE_AGREEMENT: \u0026quot;yes\u0026quot;\n      NEO4J_AUTH: neo4j/password\n      NEO4J_dbms_memory_heap_max__size: 2G\n      NEO4J_dbms_logs_debug_level: DEBUG\n      NEO4J_kafka_zookeeper_connect: zookeeper:2181\n      NEO4J_kafka_bootstrap_servers: broker:9093\n      NEO4J_streams_source_enabled: \u0026quot;false\u0026quot;\n      NEO4J_streams_source_enabled_from_sourcedb: \u0026quot;true\u0026quot;\n      NEO4J_streams_sink_enabled: \u0026quot;false\u0026quot;\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eBy default the plugin will redirect all created nodes and relationships, in the form of CDC events, on a default topic with the same name as the database.\u003c/p\u003e\n\u003cp\u003eHere is an example of a CDC node event:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;meta\u0026quot;: {\n    \u0026quot;timestamp\u0026quot;: 1532597182604,\n    \u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;tx_id\u0026quot;: 3,\n    \u0026quot;tx_event_id\u0026quot;: 0,\n    \u0026quot;tx_events_count\u0026quot;: 2,\n    \u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n    \u0026quot;source\u0026quot;: {\n      \u0026quot;hostname\u0026quot;: \u0026quot;neo4j.mycompany.com\u0026quot;\n    }\n  },\n  \u0026quot;payload\u0026quot;: {\n    \u0026quot;id\u0026quot;: \u0026quot;1004\u0026quot;,\n    \u0026quot;type\u0026quot;: \u0026quot;node\u0026quot;,\n    \u0026quot;after\u0026quot;: {\n      \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n      \u0026quot;properties\u0026quot;: {\n        \u0026quot;email\u0026quot;: \u0026quot;annek@noanswer.org\u0026quot;,\n        \u0026quot;last_name\u0026quot;: \u0026quot;Kretchmar\u0026quot;,\n        \u0026quot;first_name\u0026quot;: \u0026quot;Anne Marie\u0026quot;\n      }\n    }\n  },\n  \u0026quot;schema\u0026quot;: {\n    \u0026quot;properties\u0026quot;: {\n      \u0026quot;last_name\u0026quot;: \u0026quot;String\u0026quot;,\n      \u0026quot;email\u0026quot;: \u0026quot;String\u0026quot;,\n      \u0026quot;first_name\u0026quot;: \u0026quot;String\u0026quot;\n    },\n    \u0026quot;constraints\u0026quot;: [{\n      \u0026quot;label\u0026quot;: \u0026quot;Person\u0026quot;,\n      \u0026quot;properties\u0026quot;: [\u0026quot;first_name\u0026quot;, \u0026quot;last_name\u0026quot;],\n      \u0026quot;type\u0026quot;: \u0026quot;UNIQUE\u0026quot;\n    }]\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eleveraging the \u003ccode\u003eschema\u003c/code\u003e field (no extra field will be created), this event will be persisted as the following node:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ePerson{first_name: \u0026quot;Anne Marie\u0026quot;, last_name: \u0026quot;Kretchmar\u0026quot;, email: \u0026quot;annek@noanswer.org\u0026quot;}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eHere is an example a CDC relationship event:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;meta\u0026quot;: {\n    \u0026quot;timestamp\u0026quot;: 1532597182604,\n    \u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;tx_id\u0026quot;: 3,\n    \u0026quot;tx_event_id\u0026quot;: 0,\n    \u0026quot;tx_events_count\u0026quot;: 2,\n    \u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n    \u0026quot;source\u0026quot;: {\n      \u0026quot;hostname\u0026quot;: \u0026quot;neo4j.mycompany.com\u0026quot;\n    }\n  },\n  \u0026quot;payload\u0026quot;: {\n    \u0026quot;id\u0026quot;: \u0026quot;123\u0026quot;,\n    \u0026quot;type\u0026quot;: \u0026quot;relationship\u0026quot;,\n    \u0026quot;label\u0026quot;: \u0026quot;KNOWS\u0026quot;,\n    \u0026quot;start\u0026quot;: {\n      \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n      \u0026quot;id\u0026quot;: \u0026quot;123\u0026quot;,\n      \u0026quot;ids\u0026quot;: {\n        \u0026quot;last_name\u0026quot;: \u0026quot;Andrea\u0026quot;,\n        \u0026quot;first_name\u0026quot;: \u0026quot;Santurbano\u0026quot;\n      }\n    },\n    \u0026quot;end\u0026quot;: {\n      \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n      \u0026quot;id\u0026quot;: \u0026quot;456\u0026quot;,\n      \u0026quot;ids\u0026quot;: {\n        \u0026quot;last_name\u0026quot;: \u0026quot;Michael\u0026quot;,\n        \u0026quot;first_name\u0026quot;: \u0026quot;Hunger\u0026quot;\n      }\n    },\n    \u0026quot;after\u0026quot;: {\n      \u0026quot;properties\u0026quot;: {\n        \u0026quot;since\u0026quot;: \u0026quot;2018-04-05T12:34:00[Europe/Berlin]\u0026quot;\n      }\n    }\n  },\n  \u0026quot;schema\u0026quot;: {\n    \u0026quot;properties\u0026quot;: {\n      \u0026quot;since\u0026quot;: \u0026quot;ZonedDateTime\u0026quot;\n    },\n    \u0026quot;constraints\u0026quot;: [{\n      \u0026quot;label\u0026quot;: \u0026quot;KNOWS\u0026quot;,\n      \u0026quot;properties\u0026quot;: [\u0026quot;since\u0026quot;],\n      \u0026quot;type\u0026quot;: \u0026quot;RELATIONSHIP_PROPERTY_EXISTS\u0026quot;\n    }]\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eleveraging the \u003ccode\u003eids\u003c/code\u003e field (no extra field will be created), this event will be persisted as the following relationship:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e(:Person {first_name: \u0026quot;Andrea\u0026quot;, last_name: \u0026quot;Santurbano\u0026quot;})-[:KNOWS {since: \u0026quot;2018-04-05T12:34:00[Europe/Berlin]\u0026quot;}]-\u0026gt;(:Person {first_name: \u0026quot;Michael\u0026quot;, last_name: \u0026quot;Hunger\u0026quot;})\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eAs we said, this strategy is generally used to migrate from a Neo4j on-premise instance to a Neo4j Aura instance.\u003cbr /\u003e\nJust for test purposes we\u0026rsquo;re going to create a new \u003ccode\u003esourcedb\u003c/code\u003e database we\u0026rsquo;ll use as source database.\u003c/p\u003e\n\u003cp\u003eOn our \u003ccode\u003eneo4j\u003c/code\u003e Docker container we\u0026rsquo;ve already setup Neo4j Streams enabling the source module on the \u003ccode\u003esourcedb\u003c/code\u003e database.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e  neo4j:\n    platform: linux/amd64\n    image: neo4j:4.4-enterprise\n    hostname: neo4j\n    container_name: neo4j\n    ports:\n      - 7474:7474\n      - 7687:7687\n    depends_on:\n      - zookeeper\n      - broker\n    volumes:\n      - ./neo4j/plugins:/plugins\n    environment:\n      NEO4J_ACCEPT_LICENSE_AGREEMENT: \u0026quot;yes\u0026quot;\n      NEO4J_AUTH: neo4j/password\n      NEO4J_dbms_memory_heap_max__size: 2G\n      NEO4J_dbms_logs_debug_level: DEBUG\n      NEO4J_kafka_zookeeper_connect: zookeeper:2181\n      NEO4J_kafka_bootstrap_servers: broker:9093\n      NEO4J_streams_source_enabled: \u0026quot;false\u0026quot;\n      NEO4J_streams_source_enabled_from_sourcedb: \u0026quot;true\u0026quot;\n      NEO4J_streams_sink_enabled: \u0026quot;false\u0026quot;\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eBy default the plugin will redirect all created nodes and relationships, in the form of CDC events, on a default topic with the same name as the database.\u003c/p\u003e\n\u003cp\u003eHere is an example of a CDC node event:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;meta\u0026quot;: {\n    \u0026quot;timestamp\u0026quot;: 1532597182604,\n    \u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;tx_id\u0026quot;: 3,\n    \u0026quot;txEventId\u0026quot;: 0,\n    \u0026quot;txEventsCount\u0026quot;: 2,\n    \u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n    \u0026quot;source\u0026quot;: {\n      \u0026quot;hostname\u0026quot;: \u0026quot;neo4j.mycompany.com\u0026quot;\n    }\n  },\n  \u0026quot;payload\u0026quot;: {\n    \u0026quot;id\u0026quot;: \u0026quot;1004\u0026quot;,\n    \u0026quot;type\u0026quot;: \u0026quot;node\u0026quot;,\n    \u0026quot;before\u0026quot;: null,\n    \u0026quot;after\u0026quot;: {\n      \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n      \u0026quot;properties\u0026quot;: {\n        \u0026quot;email\u0026quot;: \u0026quot;annek@noanswer.org\u0026quot;,\n        \u0026quot;last_name\u0026quot;: \u0026quot;Kretchmar\u0026quot;,\n        \u0026quot;first_name\u0026quot;: \u0026quot;Anne Marie\u0026quot;\n      }\n    }\n  },\n  \u0026quot;schema\u0026quot;: {\n    \u0026quot;properties\u0026quot;: {\n      \u0026quot;last_name\u0026quot;: \u0026quot;String\u0026quot;,\n      \u0026quot;email\u0026quot;: \u0026quot;String\u0026quot;,\n      \u0026quot;first_name\u0026quot;: \u0026quot;String\u0026quot;\n    },\n    \u0026quot;constraints\u0026quot;: [{\n      \u0026quot;label\u0026quot;: \u0026quot;Person\u0026quot;,\n      \u0026quot;properties\u0026quot;: [\u0026quot;first_name\u0026quot;, \u0026quot;last_name\u0026quot;],\n      \u0026quot;type\u0026quot;: \u0026quot;UNIQUE\u0026quot;\n    }]\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eleveraging the \u003ccode\u003eschema\u003c/code\u003e field (no extra field will be created), this event will be persisted as the following node:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ePerson{first_name: \u0026quot;Anne Marie\u0026quot;, last_name: \u0026quot;Kretchmar\u0026quot;, email: \u0026quot;annek@noanswer.org\u0026quot;}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eHere is an example a CDC relationship event:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;meta\u0026quot;: {\n    \u0026quot;timestamp\u0026quot;: 1532597182604,\n    \u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;txId\u0026quot;: 3,\n    \u0026quot;txEventId\u0026quot;: 0,\n    \u0026quot;txEventsCount\u0026quot;: 2,\n    \u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n    \u0026quot;source\u0026quot;: {\n      \u0026quot;hostname\u0026quot;: \u0026quot;neo4j.mycompany.com\u0026quot;\n    }\n  },\n  \u0026quot;payload\u0026quot;: {\n    \u0026quot;id\u0026quot;: \u0026quot;123\u0026quot;,\n    \u0026quot;type\u0026quot;: \u0026quot;relationship\u0026quot;,\n    \u0026quot;label\u0026quot;: \u0026quot;KNOWS\u0026quot;,\n    \u0026quot;start\u0026quot;: {\n      \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n      \u0026quot;id\u0026quot;: \u0026quot;123\u0026quot;,\n      \u0026quot;ids\u0026quot;: {\n        \u0026quot;last_name\u0026quot;: \u0026quot;Andrea\u0026quot;,\n        \u0026quot;first_name\u0026quot;: \u0026quot;Santurbano\u0026quot;\n      }\n    },\n    \u0026quot;end\u0026quot;: {\n      \u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n      \u0026quot;id\u0026quot;: \u0026quot;456\u0026quot;,\n      \u0026quot;ids\u0026quot;: {\n        \u0026quot;last_name\u0026quot;: \u0026quot;Michael\u0026quot;,\n        \u0026quot;first_name\u0026quot;: \u0026quot;Hunger\u0026quot;\n      }\n    },\n    \u0026quot;before\u0026quot;: null,\n    \u0026quot;after\u0026quot;: {\n      \u0026quot;properties\u0026quot;: {\n        \u0026quot;since\u0026quot;: \u0026quot;2018-04-05T12:34:00[Europe/Berlin]\u0026quot;\n      }\n    }\n  },\n  \u0026quot;schema\u0026quot;: {\n    \u0026quot;properties\u0026quot;: {\n      \u0026quot;since\u0026quot;: \u0026quot;ZonedDateTime\u0026quot;\n    },\n    \u0026quot;constraints\u0026quot;: [{\n      \u0026quot;label\u0026quot;: \u0026quot;KNOWS\u0026quot;,\n      \u0026quot;properties\u0026quot;: [\u0026quot;since\u0026quot;],\n      \u0026quot;type\u0026quot;: \u0026quot;RELATIONSHIP_PROPERTY_EXISTS\u0026quot;\n    }]\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eleveraging the \u003ccode\u003eids\u003c/code\u003e field (no extra field will be created), this event will be persisted as the following relationship:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e(:Person {first_name: \u0026quot;Andrea\u0026quot;, last_name: \u0026quot;Santurbano\u0026quot;})-[:KNOWS {since: \u0026quot;2018-04-05T12:34:00[Europe/Berlin]\u0026quot;}]-\u0026gt;(:Person {first_name: \u0026quot;Michael\u0026quot;, last_name: \u0026quot;Hunger\u0026quot;})\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
@@ -38,15 +39,16 @@
       "jobName": "paragraph_1653471873214_294190358",
       "id": "paragraph_1653471873214_294190358",
       "dateCreated": "2022-05-25 09:44:33.214",
-      "dateStarted": "2022-05-25 09:44:56.008",
-      "dateFinished": "2022-05-25 09:44:56.025",
+      "dateStarted": "2022-06-01 16:59:41.056",
+      "dateFinished": "2022-06-01 16:59:46.363",
       "status": "FINISHED"
     },
     {
       "title": "Create the source database",
       "text": "%neo4j\ncreate database sourcedb;",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:45:40.871",
+      "dateUpdated": "2022-06-03 09:05:39.167",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -66,20 +68,61 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653471896008_105430413",
       "id": "paragraph_1653471896008_105430413",
       "dateCreated": "2022-05-25 09:44:56.008",
-      "dateStarted": "2022-05-25 09:45:40.883",
-      "dateFinished": "2022-05-25 09:45:41.085",
-      "status": "ERROR"
+      "dateStarted": "2022-06-03 09:05:39.191",
+      "dateFinished": "2022-06-03 09:05:41.467",
+      "status": "FINISHED"
     },
     {
-      "text": "%md\nWe’re going to simulate the creation of a `Person` node and a `ACTED_ID` relationship between this node and one of the previous `Movie` nodes.\n\n## Create the Sink instance\n\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Schema strategy.\n\n```\n{\n  \"name\": \"Neo4jSinkConnectorSchema\",\n  \"config\": {\n    \"topics\": \"sourcedb\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"kafka.bootstrap.servers\": \"broker:9093\",\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cdc.schema\": \"sourcedb\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cdc-schema.json\n```\n\nNow our topics list should include also our new `sourcedb` topic. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
+      "text": "%neo4j\ncreate database targetdb",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:46:04.632",
+      "dateUpdated": "2022-06-03 09:05:42.116",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654100303483_220907020",
+      "id": "paragraph_1654100303483_220907020",
+      "dateCreated": "2022-06-01 16:18:23.484",
+      "dateStarted": "2022-06-03 09:05:42.141",
+      "dateFinished": "2022-06-03 09:05:42.968",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nWe’re going to simulate the creation of a `Person` node and a `ACTED_ID` relationship between this node and one of the previous `Movie` nodes.\n\n## Create the Sink instance\n\nHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Schema strategy.\n\n```\n{\n  \"name\": \"Neo4jSinkConnectorSchema\",\n  \"config\": {\n    \"topics\": \"sourcedb\",\n    \"connector.class\": \"streams.kafka.connect.sink.Neo4jSinkConnector\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": false,\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": false,\n    \"kafka.bootstrap.servers\": \"broker:9093\",\n    \"neo4j.server.uri\": \"bolt://neo4j:7687\",\n    \"neo4j.authentication.basic.username\": \"neo4j\",\n    \"neo4j.authentication.basic.password\": \"password\",\n    \"neo4j.encryption.enabled\": false,\n    \"neo4j.topic.cdc.schema\": \"sourcedb\",\n    \"neo4j.database\": \"targetdb\"\n  }\n}\n```\n\nTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\n\n```\ncurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cdc-schema.json\n```\n\nNow our topics list should include also our new `sourcedb` topic. We can verify it by running:\n\n```\ndocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n```",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-01 16:27:09.227",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -104,7 +147,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eWe’re going to simulate the creation of a \u003ccode\u003ePerson\u003c/code\u003e node and a \u003ccode\u003eACTED_ID\u003c/code\u003e relationship between this node and one of the previous \u003ccode\u003eMovie\u003c/code\u003e nodes.\u003c/p\u003e\n\u003ch2\u003eCreate the Sink instance\u003c/h2\u003e\n\u003cp\u003eHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Schema strategy.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;name\u0026quot;: \u0026quot;Neo4jSinkConnectorSchema\u0026quot;,\n  \u0026quot;config\u0026quot;: {\n    \u0026quot;topics\u0026quot;: \u0026quot;sourcedb\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.sink.Neo4jSinkConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;kafka.bootstrap.servers\u0026quot;: \u0026quot;broker:9093\u0026quot;,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.topic.cdc.schema\u0026quot;: \u0026quot;sourcedb\u0026quot;\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cdc-schema.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow our topics list should include also our new \u003ccode\u003esourcedb\u003c/code\u003e topic. We can verify it by running:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eWe’re going to simulate the creation of a \u003ccode\u003ePerson\u003c/code\u003e node and a \u003ccode\u003eACTED_ID\u003c/code\u003e relationship between this node and one of the previous \u003ccode\u003eMovie\u003c/code\u003e nodes.\u003c/p\u003e\n\u003ch2\u003eCreate the Sink instance\u003c/h2\u003e\n\u003cp\u003eHere is a piece of JSON configuration we’re going to use to create our Neo4j Sink connector with the Schema strategy.\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\n  \u0026quot;name\u0026quot;: \u0026quot;Neo4jSinkConnectorSchema\u0026quot;,\n  \u0026quot;config\u0026quot;: {\n    \u0026quot;topics\u0026quot;: \u0026quot;sourcedb\u0026quot;,\n    \u0026quot;connector.class\u0026quot;: \u0026quot;streams.kafka.connect.sink.Neo4jSinkConnector\u0026quot;,\n    \u0026quot;key.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;key.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;value.converter\u0026quot;: \u0026quot;org.apache.kafka.connect.json.JsonConverter\u0026quot;,\n    \u0026quot;value.converter.schemas.enable\u0026quot;: false,\n    \u0026quot;kafka.bootstrap.servers\u0026quot;: \u0026quot;broker:9093\u0026quot;,\n    \u0026quot;neo4j.server.uri\u0026quot;: \u0026quot;bolt://neo4j:7687\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n    \u0026quot;neo4j.authentication.basic.password\u0026quot;: \u0026quot;password\u0026quot;,\n    \u0026quot;neo4j.encryption.enabled\u0026quot;: false,\n    \u0026quot;neo4j.topic.cdc.schema\u0026quot;: \u0026quot;sourcedb\u0026quot;,\n    \u0026quot;neo4j.database\u0026quot;: \u0026quot;targetdb\u0026quot;\n  }\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eTo create the connector instance we just need to submit the above JSON to the Kafka Connect REST endpoint, as follow:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ecurl -X POST http://localhost:8083/connectors -H \u0027Content-Type:application/json\u0027 -H \u0027Accept:application/json\u0027 -d @kafka-connect-sink-cdc-schema.json\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow our topics list should include also our new \u003ccode\u003esourcedb\u003c/code\u003e topic. We can verify it by running:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003edocker exec -it broker kafka-topics --bootstrap-server broker:9092 --list\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
@@ -114,14 +157,15 @@
       "jobName": "paragraph_1653471940882_832729180",
       "id": "paragraph_1653471940882_832729180",
       "dateCreated": "2022-05-25 09:45:40.882",
-      "dateStarted": "2022-05-25 09:46:04.627",
-      "dateFinished": "2022-05-25 09:46:04.642",
+      "dateStarted": "2022-06-01 16:27:09.208",
+      "dateFinished": "2022-06-01 16:27:10.163",
       "status": "FINISHED"
     },
     {
       "text": "%md\nBefore sending the events, remember that this strategy is based on the constraints defined in the graph model.\nLet\u0027s create our constraints on both our databases.",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 09:46:20.146",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -161,9 +205,10 @@
       "status": "FINISHED"
     },
     {
-      "text": "%neo4jSourceDb\nCREATE CONSTRAINT unique_person FOR (p:Person) REQUIRE p.name IS UNIQUE",
+      "text": "%neo4jSourceDb\nCREATE CONSTRAINT person_name IF NOT EXISTS FOR (p:Person) REQUIRE p.name IS UNIQUE",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:46:26.778",
+      "dateUpdated": "2022-06-03 09:06:13.569",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -181,18 +226,25 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653471980143_79151814",
       "id": "paragraph_1653471980143_79151814",
       "dateCreated": "2022-05-25 09:46:20.143",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:06:13.591",
+      "dateFinished": "2022-06-03 09:06:28.516",
+      "status": "FINISHED"
     },
     {
-      "text": "%neo4jSourceDb\nCREATE CONSTRAINT unique_movie FOR (m:Movie) REQUIRE (m.title) IS UNIQUE",
+      "text": "%neo4jSourceDb\nCREATE CONSTRAINT movie_title IF NOT EXISTS FOR (m:Movie) REQUIRE (m.title) IS UNIQUE",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:46:41.749",
+      "dateUpdated": "2022-06-03 09:10:31.646",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -209,6 +261,10 @@
       "settings": {
         "params": {},
         "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
       },
       "apps": [],
       "runtimeInfos": {},
@@ -216,19 +272,97 @@
       "jobName": "paragraph_1653471986827_456026107",
       "id": "paragraph_1653471986827_456026107",
       "dateCreated": "2022-05-25 09:46:26.827",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:10:31.670",
+      "dateFinished": "2022-06-03 09:10:31.942",
+      "status": "FINISHED"
     },
     {
-      "text": "%neo4j\nCREATE CONSTRAINT unique_person FOR (p:Person) REQUIRE p.name IS UNIQUE",
+      "text": "%neo4jSourceDb\nshow constraints",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:46:48.385",
+      "dateUpdated": "2022-06-03 09:10:58.788",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "name": "string",
+                      "type": "string",
+                      "entityType": "string",
+                      "labelsOrTypes": "string",
+                      "properties": "string",
+                      "ownedIndexId": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tname\ttype\tentityType\tlabelsOrTypes\tproperties\townedIndexId\n6\tmovie_title\tUNIQUENESS\tNODE\t[\"Movie\"]\t[\"title\"]\t5\n4\tperson_name\tUNIQUENESS\tNODE\t[\"Person\"]\t[\"name\"]\t3\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654101471424_1154153000",
+      "id": "paragraph_1654101471424_1154153000",
+      "dateCreated": "2022-06-01 16:37:51.424",
+      "dateStarted": "2022-06-03 09:10:58.821",
+      "dateFinished": "2022-06-03 09:10:59.135",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4jTargetDb\nCREATE CONSTRAINT person_name IF NOT EXISTS FOR (p:Person) REQUIRE p.name IS UNIQUE",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:07:09.999",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
         "results": {},
         "editorSetting": {
-          "language": "scala",
+          "language": "text",
           "editOnDblClick": false,
           "completionKey": "TAB",
           "completionSupport": true
@@ -238,6 +372,10 @@
       "settings": {
         "params": {},
         "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
       },
       "apps": [],
       "runtimeInfos": {},
@@ -245,19 +383,22 @@
       "jobName": "paragraph_1653472001825_1305132358",
       "id": "paragraph_1653472001825_1305132358",
       "dateCreated": "2022-05-25 09:46:41.825",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:07:10.034",
+      "dateFinished": "2022-06-03 09:07:23.409",
+      "status": "FINISHED"
     },
     {
-      "text": "%neo4j\nCREATE CONSTRAINT unique_movie FOR (m:Movie) REQUIRE (m.title) IS UNIQUE",
+      "text": "%neo4jTargetDb\nCREATE CONSTRAINT movie_title IF NOT EXISTS FOR (m:Movie) REQUIRE (m.title) IS UNIQUE",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:47:01.077",
+      "dateUpdated": "2022-06-03 09:07:24.615",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
         "results": {},
         "editorSetting": {
-          "language": "scala",
+          "language": "text",
           "editOnDblClick": false,
           "completionKey": "TAB",
           "completionSupport": true
@@ -268,24 +409,137 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653472013705_132917384",
       "id": "paragraph_1653472013705_132917384",
       "dateCreated": "2022-05-25 09:46:53.705",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:07:24.648",
+      "dateFinished": "2022-06-03 09:07:24.937",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4jTargetDb\nshow constraints",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:07:26.755",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "name": "string",
+                      "type": "string",
+                      "entityType": "string",
+                      "labelsOrTypes": "string",
+                      "properties": "string",
+                      "ownedIndexId": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tname\ttype\tentityType\tlabelsOrTypes\tproperties\townedIndexId\n6\tmovie_title\tUNIQUENESS\tNODE\t[\"Movie\"]\t[\"title\"]\t5\n4\tperson_name\tUNIQUENESS\tNODE\t[\"Person\"]\t[\"name\"]\t3\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654101501145_319250440",
+      "id": "paragraph_1654101501145_319250440",
+      "dateCreated": "2022-06-01 16:38:21.146",
+      "dateStarted": "2022-06-03 09:07:26.786",
+      "dateFinished": "2022-06-03 09:07:28.807",
+      "status": "FINISHED"
     },
     {
       "title": "Into the sourcedb database, Create the end node of the relationship",
-      "text": "%neo4jSourceDb\nCREATE (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"}) SET m.released\u003d2001, m.tagline\u003d\"\" RETURN m",
+      "text": "%neo4jSourceDb\nMERGE (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"}) SET m.released\u003d2001\nRETURN m",
       "user": "anonymous",
-      "dateUpdated": "2022-05-26 07:29:10.692",
+      "dateUpdated": "2022-06-03 09:11:30.865",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
-        "results": {},
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "title": "string",
+                      "released": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
         "editorSetting": {
           "language": "scala",
           "editOnDblClick": false,
@@ -298,6 +552,15 @@
       "settings": {
         "params": {},
         "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":0,\"data\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"}],\"edges\":[],\"labels\":{\"Person\":\"#374BEC\",\"Movie\":\"#71F825\"},\"types\":[],\"directed\":true}"
+          }
+        ]
       },
       "apps": [],
       "runtimeInfos": {},
@@ -305,18 +568,126 @@
       "jobName": "paragraph_1653472030020_449492516",
       "id": "paragraph_1653472030020_449492516",
       "dateCreated": "2022-05-25 09:47:10.020",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:11:30.900",
+      "dateFinished": "2022-06-03 09:11:31.139",
+      "status": "FINISHED"
+    },
+    {
+      "title": "Check it into the target database",
+      "text": "%neo4jTargetDb\nMATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"})\nRETURN m",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:28:13.386",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "title": "string",
+                      "released": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":0,\"data\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"}],\"edges\":[],\"labels\":{\"Person\":\"#94CC22\",\"Movie\":\"#B40A65\"},\"types\":[\"ACTED_IN\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654247109375_653077569",
+      "id": "paragraph_1654247109375_653077569",
+      "dateCreated": "2022-06-03 09:05:09.375",
+      "dateStarted": "2022-06-03 09:28:13.410",
+      "dateFinished": "2022-06-03 09:28:13.699",
+      "status": "FINISHED"
     },
     {
       "title": "Into the sourcedb database, Create the start node of the relationship",
-      "text": "%neo4jSourceDb\nCREATE (p:Person {name: \"Viggo Mortensen\"}) SET p.born\u003d1958 RETURN p",
+      "text": "%neo4jSourceDb\nMERGE (p:Person {name: \"Viggo Mortensen\"}) SET p.born\u003d1958\nRETURN p",
       "user": "anonymous",
-      "dateUpdated": "2022-05-26 07:29:36.434",
+      "dateUpdated": "2022-06-03 09:11:48.357",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
-        "results": {},
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "name": "string",
+                      "born": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
         "editorSetting": {
           "language": "scala",
           "editOnDblClick": false,
@@ -329,6 +700,15 @@
       "settings": {
         "params": {},
         "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":1,\"data\":{\"name\":\"Viggo Mortensen\",\"born\":\"1958\"},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Person\":\"#374BEC\",\"Movie\":\"#71F825\"},\"types\":[],\"directed\":true}"
+          }
+        ]
       },
       "apps": [],
       "runtimeInfos": {},
@@ -336,18 +716,130 @@
       "jobName": "paragraph_1653472061974_231094662",
       "id": "paragraph_1653472061974_231094662",
       "dateCreated": "2022-05-25 09:47:41.974",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:11:48.386",
+      "dateFinished": "2022-06-03 09:11:48.810",
+      "status": "FINISHED"
+    },
+    {
+      "title": "Check it into the target database",
+      "text": "%neo4jTargetDb\nMATCH (p:Person {name: \"Viggo Mortensen\"}) SET p.born\u003d1958\nRETURN p",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:12:16.368",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "name": "string",
+                      "born": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":1,\"data\":{\"name\":\"Viggo Mortensen\",\"born\":\"1958\"},\"label\":\"Person\"}],\"edges\":[],\"labels\":{\"Person\":\"#94CC22\",\"Movie\":\"#B40A65\"},\"types\":[],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654247520471_1917769329",
+      "id": "paragraph_1654247520471_1917769329",
+      "dateCreated": "2022-06-03 09:12:00.472",
+      "dateStarted": "2022-06-03 09:12:15.651",
+      "dateFinished": "2022-06-03 09:12:16.033",
+      "status": "FINISHED"
     },
     {
       "title": "Into the sourcedb database, Create the ACTED_IN relationship between the 2 previous nodes",
-      "text": "%neo4jSourceDb\nMATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"}) MATCH (p:Person {name: \"Viggo Mortensen\"}) CREATE (p)-[r:ACTED_IN {roles: [\"Aragorn \u0027Strider\u0027 Elessar II\"]}]-\u003e(m) RETURN p,r,m",
+      "text": "%neo4jSourceDb\nMATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"})\nMATCH (p:Person {name: \"Viggo Mortensen\"})\nCREATE (p)-[r:ACTED_IN {roles: [\"Aragorn \u0027Strider\u0027 Elessar II\"]}]-\u003e(m)\nRETURN *",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:48:41.272",
+      "dateUpdated": "2022-06-03 09:12:38.287",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
-        "results": {},
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "title": "string",
+                      "released": "string",
+                      "name": "string",
+                      "born": "string",
+                      "roles": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
         "editorSetting": {
           "language": "scala",
           "editOnDblClick": false,
@@ -361,18 +853,30 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":0,\"data\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"},{\"id\":1,\"data\":{\"name\":\"Viggo Mortensen\",\"born\":\"1958\"},\"label\":\"Person\"}],\"edges\":[{\"source\":1,\"target\":0,\"id\":0,\"data\":{\"roles\":\"[\\\"Aragorn \\u0027Strider\\u0027 Elessar II\\\"]\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Person\":\"#374BEC\",\"Movie\":\"#71F825\"},\"types\":[\"ACTED_IN\"],\"directed\":true}"
+          }
+        ]
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653472083175_1096673090",
       "id": "paragraph_1653472083175_1096673090",
       "dateCreated": "2022-05-25 09:48:03.175",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:12:38.309",
+      "dateFinished": "2022-06-03 09:12:39.252",
+      "status": "FINISHED"
     },
     {
-      "text": "%md\n\nLet\u0027s create a Kafkacat consumer on the `sourcebd` topic to check the events generated by the creation of `Person` node and the `ACTED_ID` relationship:\n\n```\nkcat -C -b localhost:9092 -t sourcedb\n```\n\nWe\u0027ll find the following event for the `Person` node:\n\n```\n{\"meta\":{\"timestamp\":1653467000712,\"username\":\"neo4j\",\"txId\":19,\"txEventId\":0,\"txEventsCount\":1,\"operation\":\"created\",\"source\":{\"hostname\":\"neo4j\"}},\"payload\":{\"id\":\"1\",\"before\":null,\"after\":{\"properties\":{\"born\":1958,\"name\":\"Viggo Mortensen\"},\"labels\":[\"Person\"]},\"type\":\"node\"},\"schema\":{\"properties\":{\"born\":\"Long\",\"name\":\"String\"},\"constraints\":[]}}\n```\n\nand the following event for the `ACTED_IN` relationship:\n\n```\n{\"meta\":{\"timestamp\":1653467158750,\"username\":\"neo4j\",\"txId\":22,\"txEventId\":0,\"txEventsCount\":1,\"operation\":\"created\",\"source\":{\"hostname\":\"neo4j\"}},\"payload\":{\"id\":\"0\",\"start\":{\"id\":\"1\",\"labels\":[\"Person\"],\"ids\":{\"name\":\"Viggo Mortensen\"}},\"end\":{\"id\":\"0\",\"labels\":[\"Movie\"],\"ids\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\"}},\"before\":null,\"after\":{\"properties\":{\"roles\":[\"Aragorn \u0027Strider\u0027 Elessar II\"]}},\"label\":\"ACTED_IN\",\"type\":\"relationship\"},\"schema\":{\"properties\":{\"roles\":\"String[]\"},\"constraints\":[{\"label\":\"Person\",\"properties\":[\"name\"],\"type\":\"UNIQUE\"},{\"label\":\"Movie\",\"properties\":[\"title\"],\"type\":\"UNIQUE\"}]}}\n```\n\nNow let\u0027s update the node `Person` adding for example a `gender` property and let\u0027s update the `ACTED_IN` relationship adding the `timestamp` property. The following events has been generated ",
+      "text": "%md\n\nLet\u0027s create a Kafkacat consumer on the `sourcebd` topic to check the events generated by the creation of `Person` node and the `ACTED_ID` relationship:\n\n```\nkcat -C -b localhost:9092 -t sourcedb\n```\n\nWe\u0027ll find the following event for the `Person` node:\n\n```json\n{\n\t\"meta\": {\n\t\t\"timestamp\": 1654102687908,\n\t\t\"username\": \"neo4j\",\n\t\t\"txId\": 18,\n\t\t\"txEventId\": 0,\n\t\t\"txEventsCount\": 1,\n\t\t\"operation\": \"created\",\n\t\t\"source\": {\n\t\t\t\"hostname\": \"neo4j\"\n\t\t}\n\t},\n\t\"payload\": {\n\t\t\"id\": \"0\",\n\t\t\"before\": null,\n\t\t\"after\": {\n\t\t\t\"properties\": {\n\t\t\t\t\"title\": \"The Lord of the Rings - The Fellowship of the Ring\",\n\t\t\t\t\"released\": 2001\n\t\t\t},\n\t\t\t\"labels\": [\"Movie\"]\n\t\t},\n\t\t\"type\": \"node\"\n\t},\n\t\"schema\": {\n\t\t\"properties\": {\n\t\t\t\"title\": \"String\",\n\t\t\t\"released\": \"Long\"\n\t\t},\n\t\t\"constraints\": [{\n\t\t\t\"label\": \"Movie\",\n\t\t\t\"properties\": [\"title\"],\n\t\t\t\"type\": \"UNIQUE\"\n\t\t}]\n\t}\n}\n```\n\n```json\n{\n\t\"meta\": {\n\t\t\"timestamp\": 1654102844375,\n\t\t\"username\": \"neo4j\",\n\t\t\"txId\": 20,\n\t\t\"txEventId\": 0,\n\t\t\"txEventsCount\": 1,\n\t\t\"operation\": \"created\",\n\t\t\"source\": {\n\t\t\t\"hostname\": \"neo4j\"\n\t\t}\n\t},\n\t\"payload\": {\n\t\t\"id\": \"1\",\n\t\t\"before\": null,\n\t\t\"after\": {\n\t\t\t\"properties\": {\n\t\t\t\t\"born\": 1958,\n\t\t\t\t\"name\": \"Viggo Mortensen\"\n\t\t\t},\n\t\t\t\"labels\": [\"Person\"]\n\t\t},\n\t\t\"type\": \"node\"\n\t},\n\t\"schema\": {\n\t\t\"properties\": {\n\t\t\t\"born\": \"Long\",\n\t\t\t\"name\": \"String\"\n\t\t},\n\t\t\"constraints\": [{\n\t\t\t\"label\": \"Person\",\n\t\t\t\"properties\": [\"name\"],\n\t\t\t\"type\": \"UNIQUE\"\n\t\t}]\n\t}\n}\n```\n\nand the following event for the `ACTED_IN` relationship:\n\n```json\n{\n\t\"meta\": {\n\t\t\"timestamp\": 1654102850157,\n\t\t\"username\": \"neo4j\",\n\t\t\"txId\": 23,\n\t\t\"txEventId\": 0,\n\t\t\"txEventsCount\": 1,\n\t\t\"operation\": \"created\",\n\t\t\"source\": {\n\t\t\t\"hostname\": \"neo4j\"\n\t\t}\n\t},\n\t\"payload\": {\n\t\t\"id\": \"0\",\n\t\t\"start\": {\n\t\t\t\"id\": \"1\",\n\t\t\t\"labels\": [\"Person\"],\n\t\t\t\"ids\": {\n\t\t\t\t\"name\": \"Viggo Mortensen\"\n\t\t\t}\n\t\t},\n\t\t\"end\": {\n\t\t\t\"id\": \"0\",\n\t\t\t\"labels\": [\"Movie\"],\n\t\t\t\"ids\": {\n\t\t\t\t\"title\": \"The Lord of the Rings - The Fellowship of the Ring\"\n\t\t\t}\n\t\t},\n\t\t\"before\": null,\n\t\t\"after\": {\n\t\t\t\"properties\": {\n\t\t\t\t\"roles\": [\"Aragorn \u0027Strider\u0027 Elessar II\"]\n\t\t\t}\n\t\t},\n\t\t\"label\": \"ACTED_IN\",\n\t\t\"type\": \"relationship\"\n\t},\n\t\"schema\": {\n\t\t\"properties\": {\n\t\t\t\"roles\": \"String[]\"\n\t\t},\n\t\t\"constraints\": [{\n\t\t\t\"label\": \"Person\",\n\t\t\t\"properties\": [\"name\"],\n\t\t\t\"type\": \"UNIQUE\"\n\t\t}, {\n\t\t\t\"label\": \"Movie\",\n\t\t\t\"properties\": [\"title\"],\n\t\t\t\"type\": \"UNIQUE\"\n\t\t}]\n\t}\n}\n```\n\nNow let\u0027s update the node `Person` adding for example a `gender` property and let\u0027s update the `ACTED_IN` relationship adding the `timestamp` property. The following events has been generated ",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:48:51.646",
+      "dateUpdated": "2022-06-01 17:02:29.284",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -397,7 +901,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLet\u0026rsquo;s create a Kafkacat consumer on the \u003ccode\u003esourcebd\u003c/code\u003e topic to check the events generated by the creation of \u003ccode\u003ePerson\u003c/code\u003e node and the \u003ccode\u003eACTED_ID\u003c/code\u003e relationship:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -C -b localhost:9092 -t sourcedb\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eWe\u0026rsquo;ll find the following event for the \u003ccode\u003ePerson\u003c/code\u003e node:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\u0026quot;meta\u0026quot;:{\u0026quot;timestamp\u0026quot;:1653467000712,\u0026quot;username\u0026quot;:\u0026quot;neo4j\u0026quot;,\u0026quot;txId\u0026quot;:19,\u0026quot;txEventId\u0026quot;:0,\u0026quot;txEventsCount\u0026quot;:1,\u0026quot;operation\u0026quot;:\u0026quot;created\u0026quot;,\u0026quot;source\u0026quot;:{\u0026quot;hostname\u0026quot;:\u0026quot;neo4j\u0026quot;}},\u0026quot;payload\u0026quot;:{\u0026quot;id\u0026quot;:\u0026quot;1\u0026quot;,\u0026quot;before\u0026quot;:null,\u0026quot;after\u0026quot;:{\u0026quot;properties\u0026quot;:{\u0026quot;born\u0026quot;:1958,\u0026quot;name\u0026quot;:\u0026quot;Viggo Mortensen\u0026quot;},\u0026quot;labels\u0026quot;:[\u0026quot;Person\u0026quot;]},\u0026quot;type\u0026quot;:\u0026quot;node\u0026quot;},\u0026quot;schema\u0026quot;:{\u0026quot;properties\u0026quot;:{\u0026quot;born\u0026quot;:\u0026quot;Long\u0026quot;,\u0026quot;name\u0026quot;:\u0026quot;String\u0026quot;},\u0026quot;constraints\u0026quot;:[]}}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eand the following event for the \u003ccode\u003eACTED_IN\u003c/code\u003e relationship:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003e{\u0026quot;meta\u0026quot;:{\u0026quot;timestamp\u0026quot;:1653467158750,\u0026quot;username\u0026quot;:\u0026quot;neo4j\u0026quot;,\u0026quot;txId\u0026quot;:22,\u0026quot;txEventId\u0026quot;:0,\u0026quot;txEventsCount\u0026quot;:1,\u0026quot;operation\u0026quot;:\u0026quot;created\u0026quot;,\u0026quot;source\u0026quot;:{\u0026quot;hostname\u0026quot;:\u0026quot;neo4j\u0026quot;}},\u0026quot;payload\u0026quot;:{\u0026quot;id\u0026quot;:\u0026quot;0\u0026quot;,\u0026quot;start\u0026quot;:{\u0026quot;id\u0026quot;:\u0026quot;1\u0026quot;,\u0026quot;labels\u0026quot;:[\u0026quot;Person\u0026quot;],\u0026quot;ids\u0026quot;:{\u0026quot;name\u0026quot;:\u0026quot;Viggo Mortensen\u0026quot;}},\u0026quot;end\u0026quot;:{\u0026quot;id\u0026quot;:\u0026quot;0\u0026quot;,\u0026quot;labels\u0026quot;:[\u0026quot;Movie\u0026quot;],\u0026quot;ids\u0026quot;:{\u0026quot;title\u0026quot;:\u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;}},\u0026quot;before\u0026quot;:null,\u0026quot;after\u0026quot;:{\u0026quot;properties\u0026quot;:{\u0026quot;roles\u0026quot;:[\u0026quot;Aragorn \u0027Strider\u0027 Elessar II\u0026quot;]}},\u0026quot;label\u0026quot;:\u0026quot;ACTED_IN\u0026quot;,\u0026quot;type\u0026quot;:\u0026quot;relationship\u0026quot;},\u0026quot;schema\u0026quot;:{\u0026quot;properties\u0026quot;:{\u0026quot;roles\u0026quot;:\u0026quot;String[]\u0026quot;},\u0026quot;constraints\u0026quot;:[{\u0026quot;label\u0026quot;:\u0026quot;Person\u0026quot;,\u0026quot;properties\u0026quot;:[\u0026quot;name\u0026quot;],\u0026quot;type\u0026quot;:\u0026quot;UNIQUE\u0026quot;},{\u0026quot;label\u0026quot;:\u0026quot;Movie\u0026quot;,\u0026quot;properties\u0026quot;:[\u0026quot;title\u0026quot;],\u0026quot;type\u0026quot;:\u0026quot;UNIQUE\u0026quot;}]}}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow let\u0026rsquo;s update the node \u003ccode\u003ePerson\u003c/code\u003e adding for example a \u003ccode\u003egender\u003c/code\u003e property and let\u0026rsquo;s update the \u003ccode\u003eACTED_IN\u003c/code\u003e relationship adding the \u003ccode\u003etimestamp\u003c/code\u003e property. The following events has been generated\u003c/p\u003e\n\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eLet\u0026rsquo;s create a Kafkacat consumer on the \u003ccode\u003esourcebd\u003c/code\u003e topic to check the events generated by the creation of \u003ccode\u003ePerson\u003c/code\u003e node and the \u003ccode\u003eACTED_ID\u003c/code\u003e relationship:\u003c/p\u003e\n\u003cpre\u003e\u003ccode\u003ekcat -C -b localhost:9092 -t sourcedb\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eWe\u0026rsquo;ll find the following event for the \u003ccode\u003ePerson\u003c/code\u003e node:\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"language-json\"\u003e{\n\t\u0026quot;meta\u0026quot;: {\n\t\t\u0026quot;timestamp\u0026quot;: 1654102687908,\n\t\t\u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n\t\t\u0026quot;txId\u0026quot;: 18,\n\t\t\u0026quot;txEventId\u0026quot;: 0,\n\t\t\u0026quot;txEventsCount\u0026quot;: 1,\n\t\t\u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n\t\t\u0026quot;source\u0026quot;: {\n\t\t\t\u0026quot;hostname\u0026quot;: \u0026quot;neo4j\u0026quot;\n\t\t}\n\t},\n\t\u0026quot;payload\u0026quot;: {\n\t\t\u0026quot;id\u0026quot;: \u0026quot;0\u0026quot;,\n\t\t\u0026quot;before\u0026quot;: null,\n\t\t\u0026quot;after\u0026quot;: {\n\t\t\t\u0026quot;properties\u0026quot;: {\n\t\t\t\t\u0026quot;title\u0026quot;: \u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;,\n\t\t\t\t\u0026quot;released\u0026quot;: 2001\n\t\t\t},\n\t\t\t\u0026quot;labels\u0026quot;: [\u0026quot;Movie\u0026quot;]\n\t\t},\n\t\t\u0026quot;type\u0026quot;: \u0026quot;node\u0026quot;\n\t},\n\t\u0026quot;schema\u0026quot;: {\n\t\t\u0026quot;properties\u0026quot;: {\n\t\t\t\u0026quot;title\u0026quot;: \u0026quot;String\u0026quot;,\n\t\t\t\u0026quot;released\u0026quot;: \u0026quot;Long\u0026quot;\n\t\t},\n\t\t\u0026quot;constraints\u0026quot;: [{\n\t\t\t\u0026quot;label\u0026quot;: \u0026quot;Movie\u0026quot;,\n\t\t\t\u0026quot;properties\u0026quot;: [\u0026quot;title\u0026quot;],\n\t\t\t\u0026quot;type\u0026quot;: \u0026quot;UNIQUE\u0026quot;\n\t\t}]\n\t}\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cpre\u003e\u003ccode class\u003d\"language-json\"\u003e{\n\t\u0026quot;meta\u0026quot;: {\n\t\t\u0026quot;timestamp\u0026quot;: 1654102844375,\n\t\t\u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n\t\t\u0026quot;txId\u0026quot;: 20,\n\t\t\u0026quot;txEventId\u0026quot;: 0,\n\t\t\u0026quot;txEventsCount\u0026quot;: 1,\n\t\t\u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n\t\t\u0026quot;source\u0026quot;: {\n\t\t\t\u0026quot;hostname\u0026quot;: \u0026quot;neo4j\u0026quot;\n\t\t}\n\t},\n\t\u0026quot;payload\u0026quot;: {\n\t\t\u0026quot;id\u0026quot;: \u0026quot;1\u0026quot;,\n\t\t\u0026quot;before\u0026quot;: null,\n\t\t\u0026quot;after\u0026quot;: {\n\t\t\t\u0026quot;properties\u0026quot;: {\n\t\t\t\t\u0026quot;born\u0026quot;: 1958,\n\t\t\t\t\u0026quot;name\u0026quot;: \u0026quot;Viggo Mortensen\u0026quot;\n\t\t\t},\n\t\t\t\u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;]\n\t\t},\n\t\t\u0026quot;type\u0026quot;: \u0026quot;node\u0026quot;\n\t},\n\t\u0026quot;schema\u0026quot;: {\n\t\t\u0026quot;properties\u0026quot;: {\n\t\t\t\u0026quot;born\u0026quot;: \u0026quot;Long\u0026quot;,\n\t\t\t\u0026quot;name\u0026quot;: \u0026quot;String\u0026quot;\n\t\t},\n\t\t\u0026quot;constraints\u0026quot;: [{\n\t\t\t\u0026quot;label\u0026quot;: \u0026quot;Person\u0026quot;,\n\t\t\t\u0026quot;properties\u0026quot;: [\u0026quot;name\u0026quot;],\n\t\t\t\u0026quot;type\u0026quot;: \u0026quot;UNIQUE\u0026quot;\n\t\t}]\n\t}\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eand the following event for the \u003ccode\u003eACTED_IN\u003c/code\u003e relationship:\u003c/p\u003e\n\u003cpre\u003e\u003ccode class\u003d\"language-json\"\u003e{\n\t\u0026quot;meta\u0026quot;: {\n\t\t\u0026quot;timestamp\u0026quot;: 1654102850157,\n\t\t\u0026quot;username\u0026quot;: \u0026quot;neo4j\u0026quot;,\n\t\t\u0026quot;txId\u0026quot;: 23,\n\t\t\u0026quot;txEventId\u0026quot;: 0,\n\t\t\u0026quot;txEventsCount\u0026quot;: 1,\n\t\t\u0026quot;operation\u0026quot;: \u0026quot;created\u0026quot;,\n\t\t\u0026quot;source\u0026quot;: {\n\t\t\t\u0026quot;hostname\u0026quot;: \u0026quot;neo4j\u0026quot;\n\t\t}\n\t},\n\t\u0026quot;payload\u0026quot;: {\n\t\t\u0026quot;id\u0026quot;: \u0026quot;0\u0026quot;,\n\t\t\u0026quot;start\u0026quot;: {\n\t\t\t\u0026quot;id\u0026quot;: \u0026quot;1\u0026quot;,\n\t\t\t\u0026quot;labels\u0026quot;: [\u0026quot;Person\u0026quot;],\n\t\t\t\u0026quot;ids\u0026quot;: {\n\t\t\t\t\u0026quot;name\u0026quot;: \u0026quot;Viggo Mortensen\u0026quot;\n\t\t\t}\n\t\t},\n\t\t\u0026quot;end\u0026quot;: {\n\t\t\t\u0026quot;id\u0026quot;: \u0026quot;0\u0026quot;,\n\t\t\t\u0026quot;labels\u0026quot;: [\u0026quot;Movie\u0026quot;],\n\t\t\t\u0026quot;ids\u0026quot;: {\n\t\t\t\t\u0026quot;title\u0026quot;: \u0026quot;The Lord of the Rings - The Fellowship of the Ring\u0026quot;\n\t\t\t}\n\t\t},\n\t\t\u0026quot;before\u0026quot;: null,\n\t\t\u0026quot;after\u0026quot;: {\n\t\t\t\u0026quot;properties\u0026quot;: {\n\t\t\t\t\u0026quot;roles\u0026quot;: [\u0026quot;Aragorn \u0027Strider\u0027 Elessar II\u0026quot;]\n\t\t\t}\n\t\t},\n\t\t\u0026quot;label\u0026quot;: \u0026quot;ACTED_IN\u0026quot;,\n\t\t\u0026quot;type\u0026quot;: \u0026quot;relationship\u0026quot;\n\t},\n\t\u0026quot;schema\u0026quot;: {\n\t\t\u0026quot;properties\u0026quot;: {\n\t\t\t\u0026quot;roles\u0026quot;: \u0026quot;String[]\u0026quot;\n\t\t},\n\t\t\u0026quot;constraints\u0026quot;: [{\n\t\t\t\u0026quot;label\u0026quot;: \u0026quot;Person\u0026quot;,\n\t\t\t\u0026quot;properties\u0026quot;: [\u0026quot;name\u0026quot;],\n\t\t\t\u0026quot;type\u0026quot;: \u0026quot;UNIQUE\u0026quot;\n\t\t}, {\n\t\t\t\u0026quot;label\u0026quot;: \u0026quot;Movie\u0026quot;,\n\t\t\t\u0026quot;properties\u0026quot;: [\u0026quot;title\u0026quot;],\n\t\t\t\u0026quot;type\u0026quot;: \u0026quot;UNIQUE\u0026quot;\n\t\t}]\n\t}\n}\n\u003c/code\u003e\u003c/pre\u003e\n\u003cp\u003eNow let\u0026rsquo;s update the node \u003ccode\u003ePerson\u003c/code\u003e adding for example a \u003ccode\u003egender\u003c/code\u003e property and let\u0026rsquo;s update the \u003ccode\u003eACTED_IN\u003c/code\u003e relationship adding the \u003ccode\u003etimestamp\u003c/code\u003e property. The following events has been generated\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
@@ -407,30 +911,156 @@
       "jobName": "paragraph_1653472122969_51767236",
       "id": "paragraph_1653472122969_51767236",
       "dateCreated": "2022-05-25 09:48:42.969",
-      "dateStarted": "2022-05-25 09:48:51.642",
-      "dateFinished": "2022-05-25 09:48:51.657",
+      "dateStarted": "2022-06-01 17:02:29.283",
+      "dateFinished": "2022-06-01 17:02:29.374",
       "status": "FINISHED"
     },
     {
-      "text": "%neo4jSourceDb\nMATCH (p:Person {name: \"Viggo Mortensen\"}) SET p.gender \u003d \u0027male\u0027 \nWITH p\nMATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"})\nWITH p,m\nMERGE (p)-[r:ACTED_IN]-\u003e(m) SET r.timestamp \u003d timestamp()\nRETURN p,r,m",
+      "title": "Check the data in the target db",
+      "text": "%neo4jTargetDb\nmatch (p:Person {name: \"Viggo Mortensen\"})-[r:ACTED_IN]-\u003e(m:Movie)\nreturn p,r,m",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:49:04.518",
+      "dateUpdated": "2022-06-03 09:13:10.281",
+      "progress": 0,
       "config": {
-        "colWidth": 12.0,
-        "fontSize": 9.0,
-        "enabled": true,
-        "results": {},
         "editorSetting": {
           "language": "markdown",
           "editOnDblClick": false,
           "completionKey": "TAB",
           "completionSupport": false
         },
-        "editorMode": "ace/mode/undefined"
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "title": "string",
+                      "released": "string",
+                      "name": "string",
+                      "born": "string",
+                      "roles": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true,
+        "title": true
       },
       "settings": {
         "params": {},
         "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":0,\"data\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"},{\"id\":1,\"data\":{\"name\":\"Viggo Mortensen\",\"born\":\"1958\"},\"label\":\"Person\"}],\"edges\":[{\"source\":1,\"target\":0,\"id\":0,\"data\":{\"roles\":\"[\\\"Aragorn \\u0027Strider\\u0027 Elessar II\\\"]\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Person\":\"#94CC22\",\"Movie\":\"#B40A65\"},\"types\":[\"ACTED_IN\"],\"directed\":true}"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654243552500_2088378056",
+      "id": "paragraph_1654243552500_2088378056",
+      "dateCreated": "2022-06-03 08:05:52.500",
+      "dateStarted": "2022-06-03 09:13:09.216",
+      "dateFinished": "2022-06-03 09:13:09.768",
+      "status": "FINISHED"
+    },
+    {
+      "title": "Let\u0027s write a complex Cypher query that does many things in one transaction",
+      "text": "%neo4jSourceDb\n// we match the actor and add the Gender\nMATCH (p:Person {name: \"Viggo Mortensen\"})\n    SET p.gender \u003d \u0027male\u0027 \nWITH p\n// we match the movie\nMATCH (m:Movie {title: \"The Lord of the Rings - The Fellowship of the Ring\"})\nWITH p,m\n// we match the relationship and add the timestamp property\nMATCH (p)-[r:ACTED_IN]-\u003e(m)\n    SET r.timestamp \u003d timestamp()\nRETURN p,r,m",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-03 09:17:26.286",
+      "progress": 0,
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "title": "string",
+                      "released": "string",
+                      "name": "string",
+                      "gender": "string",
+                      "born": "string",
+                      "roles": "string",
+                      "timestamp": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/undefined",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":0,\"data\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"},{\"id\":1,\"data\":{\"name\":\"Viggo Mortensen\",\"gender\":\"male\",\"born\":\"1958\"},\"label\":\"Person\"}],\"edges\":[{\"source\":1,\"target\":0,\"id\":0,\"data\":{\"roles\":\"[\\\"Aragorn \\u0027Strider\\u0027 Elessar II\\\"]\",\"timestamp\":\"1654247707148\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Person\":\"#374BEC\",\"Movie\":\"#71F825\"},\"types\":[\"ACTED_IN\"],\"directed\":true}"
+          }
+        ]
       },
       "apps": [],
       "runtimeInfos": {},
@@ -438,12 +1068,15 @@
       "jobName": "paragraph_1653472131641_732866897",
       "id": "paragraph_1653472131641_732866897",
       "dateCreated": "2022-05-25 09:48:51.641",
-      "status": "READY"
+      "dateStarted": "2022-06-03 09:15:06.958",
+      "dateFinished": "2022-06-03 09:15:07.753",
+      "status": "FINISHED"
     },
     {
       "text": "%md\nNow verify that our operations on the `sourcedb` database has been reflected on the `neo4j` database by the schema strategy.",
       "user": "anonymous",
       "dateUpdated": "2022-05-25 09:49:21.903",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
@@ -483,16 +1116,54 @@
       "status": "FINISHED"
     },
     {
-      "text": "%neo4j\nmatch (p:Person {name: \"Viggo Mortensen\"})-[r:ACTED_IN]-\u003e(m:Movie) return p,r,m",
+      "text": "%neo4jTargetDb\nmatch (p:Person {name: \"Viggo Mortensen\"})-[r:ACTED_IN]-\u003e(m:Movie) return p,r,m",
       "user": "anonymous",
-      "dateUpdated": "2022-05-25 09:49:27.028",
+      "dateUpdated": "2022-06-03 09:17:26.964",
+      "progress": 0,
       "config": {
         "colWidth": 12.0,
         "fontSize": 9.0,
         "enabled": true,
-        "results": {},
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "network",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "label": "string",
+                      "title": "string",
+                      "released": "string",
+                      "name": "string",
+                      "gender": "string",
+                      "born": "string",
+                      "roles": "string",
+                      "timestamp": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          }
+        },
         "editorSetting": {
-          "language": "markdown",
+          "language": "text",
           "editOnDblClick": false,
           "completionKey": "TAB",
           "completionSupport": false
@@ -503,12 +1174,41 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "NETWORK",
+            "data": "{\"nodes\":[{\"id\":0,\"data\":{\"title\":\"The Lord of the Rings - The Fellowship of the Ring\",\"released\":\"2001\"},\"label\":\"Movie\"},{\"id\":1,\"data\":{\"name\":\"Viggo Mortensen\",\"gender\":\"male\",\"born\":\"1958\"},\"label\":\"Person\"}],\"edges\":[{\"source\":1,\"target\":0,\"id\":0,\"data\":{\"roles\":\"[\\\"Aragorn \\u0027Strider\\u0027 Elessar II\\\"]\",\"timestamp\":\"1654247707148\"},\"label\":\"ACTED_IN\"}],\"labels\":{\"Person\":\"#94CC22\",\"Movie\":\"#B40A65\"},\"types\":[\"ACTED_IN\"],\"directed\":true}"
+          }
+        ]
+      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1653472161901_276446652",
       "id": "paragraph_1653472161901_276446652",
       "dateCreated": "2022-05-25 09:49:21.901",
+      "dateStarted": "2022-06-03 09:17:26.993",
+      "dateFinished": "2022-06-03 09:17:27.267",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%neo4jTargetDb\n",
+      "user": "anonymous",
+      "dateUpdated": "2022-06-01 19:19:50.940",
+      "progress": 0,
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1654111190933_343723824",
+      "id": "paragraph_1654111190933_343723824",
+      "dateCreated": "2022-06-01 19:19:50.939",
       "status": "READY"
     }
   ],
